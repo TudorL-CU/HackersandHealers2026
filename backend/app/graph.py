@@ -6,6 +6,7 @@ from app.nodes.summarizer import summarize_patient
 from app.nodes.change_detector import detect_changes
 from app.nodes.risk_analyzer import analyze_risks
 from app.nodes.action_recommender import recommend_actions
+from app.nodes.care_advisor import advise_care
 
 
 class CopilotState(TypedDict):
@@ -16,15 +17,24 @@ class CopilotState(TypedDict):
     changes: list[str]
     risks: list[dict]
     actions: list[str]
+    questions: list[str]
+    alerts: list[dict]
 
 
 async def all_parallel_node(state: CopilotState) -> dict:
-    story, changes, risks = await asyncio.gather(
+    story, changes, risks, care = await asyncio.gather(
         summarize_patient(state["timeline"]),
         detect_changes(state["timeline"]),
         analyze_risks(state["timeline"]),
+        advise_care(state["timeline"]),
     )
-    return {"story": story, "changes": changes, "risks": risks}
+    return {
+        "story": story,
+        "changes": changes,
+        "risks": risks,
+        "questions": care["questions"],
+        "alerts": care["alerts"],
+    }
 
 
 async def actions_node(state: CopilotState) -> dict:

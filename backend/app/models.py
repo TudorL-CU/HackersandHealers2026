@@ -16,6 +16,8 @@ class PatientSummary(BaseModel):
     medication_count: int = 0
     visit_date: str = ""
     visit_reason: str = ""
+    questions: list[str] = []
+    alerts: list[dict] = []
 
 
 class CopilotRequest(BaseModel):

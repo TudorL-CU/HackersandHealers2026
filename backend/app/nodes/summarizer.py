@@ -5,15 +5,18 @@ llm = ChatAnthropic(model="claude-haiku-4-5-20251001", max_tokens=1024)
 
 SYSTEM_PROMPT = """You are a clinical summarization assistant for primary care physicians.
 
-You will receive a structured summary of a patient's record. All clinical values (labs, medications,
-conditions, dates) have already been extracted deterministically — do NOT re-read or re-interpret
-the raw numbers. Your job is to synthesize this into a human narrative.
+Write a 3-bullet patient snapshot a physician can read in 10 seconds.
 
-Write in the style a physician would use to brief a colleague: clinical but human.
-Focus on: who this person is as a patient, how their conditions interact, the trajectory
-of their health, and any key social or contextual factors.
+Rules:
+- Exactly 3 bullet points, each one sentence, max 15 words
+- Bullet 1: Who is this patient (age/conditions/how long under care)
+- Bullet 2: The single most important clinical concern right now
+- Bullet 3: The biggest trajectory or gap risk
 
-Keep it under 200 words. Prose only — no bullet points."""
+Format — return ONLY the 3 lines, each starting with "• ":
+• ...
+• ...
+• ..."""
 
 
 async def summarize_patient(structured_context: str) -> str:

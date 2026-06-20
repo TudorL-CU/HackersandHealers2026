@@ -144,7 +144,10 @@ function renderResults(data, patient) {
   if (visit_date || visit_reason) {
     $('visitBanner').style.display = 'block';
     $('visitBannerDate').textContent = visit_date ? `📅 ${visit_date}` : '';
-    $('visitBannerReason').textContent = visit_reason || '';
+    const reason = visit_reason || '';
+    const truncated = reason.length > 72 ? reason.slice(0, 69).replace(/\s\S*$/, '') + '…' : reason;
+    $('visitBannerReason').textContent = truncated;
+    $('visitBannerReason').title = reason; // full text on hover
   } else {
     $('visitBanner').style.display = 'none';
   }
@@ -164,7 +167,20 @@ function renderResults(data, patient) {
 // ── This Visit tab ────────────────────────────────────────────────────────
 
 function renderThisVisitTab(summary) {
-  const { visit_date, visit_reason, risks = [], actions = [], lab_trends = {}, conditions_timeline = [], changes = [] } = summary;
+  const { visit_date, visit_reason, risks = [], actions = [], lab_trends = {}, conditions_timeline = [], changes = [], alerts = [], questions = [] } = summary;
+
+  // Care gap alerts
+  const alertsSection = $('alertsSection');
+  const alertsList = $('alertsList');
+  alertsList.innerHTML = '';
+  if (alerts.length > 0) {
+    alertsSection.style.display = 'block';
+    for (const alert of alerts) {
+      alertsList.appendChild(buildAlertChip(alert));
+    }
+  } else {
+    alertsSection.style.display = 'none';
+  }
 
   // Stat pills (clickable → switch to full chart tab)
   const statsEl = $('visitStats');
@@ -205,6 +221,21 @@ function renderThisVisitTab(summary) {
     for (const risk of visitRisks) {
       visitRisksList.appendChild(buildRiskCard(risk));
     }
+  }
+
+  // Questions to ask
+  const questionsSection = $('questionsSection');
+  const questionsList = $('questionsList');
+  questionsList.innerHTML = '';
+  if (questions.length > 0) {
+    questionsSection.style.display = 'block';
+    for (const q of questions) {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="q-icon">?</span><span>${q}</span>`;
+      questionsList.appendChild(li);
+    }
+  } else {
+    questionsSection.style.display = 'none';
   }
 
   // Top 3 actions
@@ -360,6 +391,26 @@ const RISK_CONF = {
   LOW:    { color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB', dot: '⚪' },
 };
 
+function buildAlertChip(alert) {
+  const isHigh = alert.urgency === 'HIGH';
+  const chip = document.createElement('div');
+  chip.className = 'alert-chip';
+  chip.style.cssText = `border-left-color:${isHigh ? '#EF4444' : '#D97706'};background:${isHigh ? '#FEF2F2' : '#FFFBEB'};`;
+
+  const hasDetail = alert.detail && alert.detail.trim();
+  chip.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:8px">
+      <span style="font-size:13px;flex-shrink:0">${isHigh ? '🔴' : '🟡'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:#111827;line-height:1.3">${alert.message}</div>
+        ${hasDetail ? `<div class="alert-detail">${alert.detail}</div>` : ''}
+      </div>
+      <span style="font-size:9px;font-weight:700;color:${isHigh ? '#EF4444' : '#D97706'};background:white;border:1px solid ${isHigh ? '#FECACA' : '#FDE68A'};border-radius:20px;padding:2px 6px;flex-shrink:0;letter-spacing:.04em">${isHigh ? 'URGENT' : 'DUE'}</span>
+    </div>
+  `;
+  return chip;
+}
+
 function buildRiskCard(risk) {
   const wrapper = document.createElement('li');
   wrapper.style.cssText = 'list-style:none;padding:0;margin-bottom:6px;';
@@ -407,26 +458,18 @@ function buildRiskCard(risk) {
 // ── Render helpers ────────────────────────────────────────────────────────
 
 function renderStory(story) {
-  const needsTruncate = story.length > STORY_PREVIEW_LENGTH;
-  const preview = needsTruncate ? story.slice(0, STORY_PREVIEW_LENGTH).replace(/\s+\S*$/, '') + '...' : story;
-  $('storyPreview').textContent = preview;
-  $('storyFull').textContent = story;
-  const toggle = $('storyToggle');
-  if (needsTruncate) {
-    toggle.style.display = 'inline';
-    toggle.textContent = 'Read more';
-    let expanded = false;
-    toggle.onclick = () => {
-      expanded = !expanded;
-      $('storyPreview').style.display = expanded ? 'none' : 'block';
-      $('storyFull').style.display = expanded ? 'block' : 'none';
-      toggle.textContent = expanded ? 'Show less' : 'Read more';
-    };
-  } else {
-    toggle.style.display = 'none';
+  const bulletsEl = $('storyBullets');
+  bulletsEl.innerHTML = '';
+  // Parse "• ..." lines; fall back to splitting prose into 3 chunks
+  const lines = story.split('\n').map(l => l.trim()).filter(l => l.startsWith('•') || l.startsWith('-'));
+  const bullets = lines.length >= 2
+    ? lines.map(l => l.replace(/^[•\-]\s*/, '').trim())
+    : story.split(/\.\s+/).filter(s => s.trim().length > 10).slice(0, 3).map(s => s.trim().replace(/\.$/, ''));
+  for (const b of bullets) {
+    const li = document.createElement('li');
+    li.textContent = b;
+    bulletsEl.appendChild(li);
   }
-  $('storyPreview').style.display = 'block';
-  $('storyFull').style.display = 'none';
 }
 
 function renderList(key, items, icon, color) {

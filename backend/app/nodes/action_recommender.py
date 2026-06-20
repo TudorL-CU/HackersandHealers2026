@@ -1,7 +1,7 @@
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage
 
-llm = ChatAnthropic(model="claude-sonnet-4-6", max_tokens=1024)
+llm = ChatAnthropic(model="claude-haiku-4-5-20251001", max_tokens=1024)
 
 SYSTEM_PROMPT = """You are a clinical action planning assistant for primary care physicians.
 Given a patient's timeline, the detected changes, and identified risks, recommend

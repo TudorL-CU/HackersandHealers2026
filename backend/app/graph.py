@@ -18,17 +18,13 @@ class CopilotState(TypedDict):
     actions: list[str]
 
 
-async def summarize_node(state: CopilotState) -> dict:
-    story = await summarize_patient(state["timeline"])
-    return {"story": story}
-
-
-async def parallel_analysis_node(state: CopilotState) -> dict:
-    changes, risks = await asyncio.gather(
+async def all_parallel_node(state: CopilotState) -> dict:
+    story, changes, risks = await asyncio.gather(
+        summarize_patient(state["timeline"]),
         detect_changes(state["timeline"]),
         analyze_risks(state["timeline"]),
     )
-    return {"changes": changes, "risks": risks}
+    return {"story": story, "changes": changes, "risks": risks}
 
 
 async def actions_node(state: CopilotState) -> dict:
@@ -43,12 +39,10 @@ async def actions_node(state: CopilotState) -> dict:
 def build_graph():
     builder = StateGraph(CopilotState)
 
-    builder.add_node("summarize", summarize_node)
-    builder.add_node("analyze", parallel_analysis_node)
+    builder.add_node("analyze", all_parallel_node)
     builder.add_node("recommend", actions_node)
 
-    builder.set_entry_point("summarize")
-    builder.add_edge("summarize", "analyze")
+    builder.set_entry_point("analyze")
     builder.add_edge("analyze", "recommend")
     builder.add_edge("recommend", END)
 

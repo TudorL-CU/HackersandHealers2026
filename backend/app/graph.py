@@ -14,7 +14,7 @@ class CopilotState(TypedDict):
     timeline: str
     story: str
     changes: list[str]
-    risks: list[str]
+    risks: list[dict]
     actions: list[str]
 
 

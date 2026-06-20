@@ -85,7 +85,7 @@ async def run_copilot(request: CopilotRequest):
         "risks": [],
         "actions": [],
     }
-    result = await copilot_graph.ainvoke(initial_state)
+    result = await copilot_graph.astream(initial_state)
 
     # ── Step 3: convert extracted data to chart format ─────────────────────
     lab_trends = to_lab_trends(patient_record)
@@ -104,6 +104,8 @@ async def run_copilot(request: CopilotRequest):
             lab_trends=lab_trends,
             conditions_timeline=conditions_timeline,
             medication_count=med_count,
+            visit_date=patient_record.visit_date,
+            visit_reason=patient_record.visit_reason,
         ),
         sources=[f"FHIR Server: Patient/{request.patient_id}"],
         processing_time_seconds=round(elapsed, 2),
@@ -149,6 +151,8 @@ async def analyze_page(request: PageAnalysisRequest):
             lab_trends=lab_trends,
             conditions_timeline=conditions_timeline,
             medication_count=0,
+            visit_date=patient_record.visit_date,
+            visit_reason=patient_record.visit_reason,
         ),
         sources=[request.page_url or "Current browser tab"],
         processing_time_seconds=round(elapsed, 2),

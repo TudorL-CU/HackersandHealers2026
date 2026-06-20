@@ -77,12 +77,7 @@ export default function CopilotView({ data, patient }) {
           position="left"
           count={summary.risks.length}
         >
-          <ExpandableList
-            items={summary.risks}
-            icon="!"
-            iconColor="var(--red-600)"
-            previewCount={3}
-          />
+          <RiskList risks={summary.risks} previewCount={3} />
         </Section>
 
         {/* Recommended Actions */}
@@ -193,6 +188,101 @@ function ExpandableList({ items, icon, iconColor, previewCount }) {
           }}
         >
           {expanded ? 'Show less' : `Show ${items.length - previewCount} more`}
+        </button>
+      )}
+    </div>
+  )
+}
+
+const CONFIDENCE_META = {
+  HIGH:   { color: '#DC2626', bg: '#FEF2F2', border: '#FECACA', label: 'HIGH',   dot: '🔴' },
+  MEDIUM: { color: '#D97706', bg: '#FFFBEB', border: '#FDE68A', label: 'MEDIUM', dot: '🟡' },
+  LOW:    { color: '#6B7280', bg: '#F9FAFB', border: '#E5E7EB', label: 'LOW',    dot: '⚪' },
+}
+
+function RiskCard({ risk }) {
+  const [expanded, setExpanded] = useState(false)
+  // Handle both new dict format and legacy string format
+  if (typeof risk === 'string') {
+    return (
+      <div style={{ padding: '8px 0', borderBottom: '1px solid #F3F4F6', fontSize: 14, color: '#374151', display: 'flex', gap: 8 }}>
+        <span style={{ color: '#DC2626', fontWeight: 700, flexShrink: 0 }}>!</span>
+        <span>{risk}</span>
+      </div>
+    )
+  }
+
+  const { issue, confidence = 'MEDIUM', evidence } = risk
+  const meta = CONFIDENCE_META[confidence] || CONFIDENCE_META.MEDIUM
+
+  return (
+    <div style={{
+      background: meta.bg,
+      border: `1px solid ${meta.border}`,
+      borderLeft: `3px solid ${meta.color}`,
+      borderRadius: 8,
+      padding: '10px 12px',
+      marginBottom: 8,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.4, flex: 1 }}>
+          {meta.dot} {issue}
+        </div>
+        <span style={{
+          flexShrink: 0,
+          fontSize: 10, fontWeight: 700,
+          color: meta.color,
+          background: 'white',
+          border: `1px solid ${meta.border}`,
+          borderRadius: 20,
+          padding: '2px 8px',
+          letterSpacing: '0.05em',
+        }}>
+          {meta.label}
+        </span>
+      </div>
+      {evidence && (
+        <>
+          <div style={{
+            fontSize: 12, color: '#6B7280', marginTop: 6, lineHeight: 1.5,
+            display: expanded ? 'block' : '-webkit-box',
+            WebkitLineClamp: expanded ? 'unset' : 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}>
+            <span style={{ fontWeight: 600, color: '#9CA3AF', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Evidence: </span>
+            {evidence}
+          </div>
+          {evidence.length > 120 && (
+            <button onClick={() => setExpanded(!expanded)} style={{
+              marginTop: 3, background: 'none', border: 'none',
+              color: meta.color, fontSize: 11, fontWeight: 600,
+              cursor: 'pointer', padding: 0,
+            }}>
+              {expanded ? 'Show less' : 'Show more'}
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+function RiskList({ risks, previewCount }) {
+  const [expanded, setExpanded] = useState(false)
+  const visible = expanded ? risks : risks.slice(0, previewCount)
+  const hidden = risks.length - previewCount
+
+  return (
+    <div>
+      {visible.map((risk, i) => <RiskCard key={i} risk={risk} />)}
+      {hidden > 0 && (
+        <button onClick={() => setExpanded(!expanded)} style={{
+          marginTop: 4, background: 'none', border: 'none',
+          color: '#DC2626', fontSize: 12, fontWeight: 600,
+          cursor: 'pointer', padding: 0,
+        }}>
+          {expanded ? 'Show less' : `Show ${hidden} more`}
         </button>
       )}
     </div>

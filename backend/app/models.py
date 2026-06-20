@@ -7,13 +7,15 @@ class PatientSummary(BaseModel):
     patient_name: str
     story: str
     changes: list[str]
-    risks: list[str]
+    risks: list[dict]
     actions: list[str]
     confidence: dict[str, str] = {}
     # Structured data for charts
     lab_trends: dict[str, list[dict]] = {}
     conditions_timeline: list[dict] = []
     medication_count: int = 0
+    visit_date: str = ""
+    visit_reason: str = ""
 
 
 class CopilotRequest(BaseModel):

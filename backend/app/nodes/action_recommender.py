@@ -5,20 +5,16 @@ llm = ChatAnthropic(model="claude-haiku-4-5-20251001", max_tokens=1024)
 
 SYSTEM_PROMPT = """You are a clinical action planning assistant for primary care physicians.
 
-You will receive a structured patient record (pre-extracted data) along with clinically significant
-changes and identified risks. All values have been extracted deterministically — your job is to
-recommend concrete next steps, not to re-read or re-derive the data.
+Return a prioritised list of actions the clinician should take TODAY or schedule soon.
 
-Each action should be:
-- Specific and actionable — reference the exact finding that drives the action
-- Something the CLINICIAN can do NOW or schedule in the near term
-- Framed from the clinician's perspective (not the patient's)
-- Tied directly to a value or risk from the structured data
+Rules — strictly enforced:
+- ONE sentence per action, max 12 words. No sub-bullets, no explanations, no "consider".
+- Start with a verb: Order / Uptitrate / Refer / Schedule / Review / Check / Stop.
+- Include the key value or finding in the sentence (e.g. "HbA1c 7.5%", "eGFR 64").
+- No padding, no rationale — just the action.
 
-Think about: orders to place, referrals to make, dose adjustments, follow-up scheduling,
-medication safety checks, overdue screenings, conversations to have.
-
-Prioritize by clinical urgency. Use the exact values from the structured context.
+Bad: "Consider reviewing the antihypertensive regimen given the elevated blood pressure readings over the past several months and the worsening trend."
+Good: "Uptitrate antihypertensive — BP 148/92 mmHg, 5 consecutive readings above target."
 
 Return a JSON array of strings. Return ONLY the JSON array, no other text."""
 
@@ -26,16 +22,25 @@ Return a JSON array of strings. Return ONLY the JSON array, no other text."""
 async def recommend_actions(
     structured_context: str,
     changes: list[str],
-    risks: list[str],
+    risks: list[dict],
 ) -> list[str]:
+    # Extract issue + evidence text from structured risk objects
+    risk_lines = []
+    for r in risks:
+        if isinstance(r, dict):
+            line = f"[{r.get('confidence', 'MEDIUM')}] {r.get('issue', '')} — {r.get('evidence', '')}".strip(" —")
+        else:
+            line = str(r)
+        risk_lines.append(f"- {line}")
+
     human_content = f"""Patient record (pre-extracted):
 {structured_context}
 
 Clinically significant changes identified:
 {chr(10).join(f'- {c}' for c in changes)}
 
-Risks identified:
-{chr(10).join(f'- {r}' for r in risks)}"""
+Risks identified (with confidence + evidence):
+{chr(10).join(risk_lines)}"""
 
     response = await llm.ainvoke([
         SystemMessage(content=SYSTEM_PROMPT),

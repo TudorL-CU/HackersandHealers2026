@@ -1,0 +1,257 @@
+{
+  "resourceType": "Bundle",
+  "id": "patient-002-bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "patient-002",
+        "name": [{ "family": "Kowalski", "given": ["Robert", "Jan"] }],
+        "birthDate": "1963-08-27",
+        "gender": "male",
+        "address": [{ "city": "Toronto", "state": "ON", "country": "CA" }]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-002-1",
+        "subject": { "reference": "Patient/patient-002" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "84114007", "display": "Heart failure" }],
+          "text": "Congestive Heart Failure (EF 35%)"
+        },
+        "onsetDateTime": "2018-04-11"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-002-2",
+        "subject": { "reference": "Patient/patient-002" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "49436004", "display": "Atrial fibrillation" }],
+          "text": "Chronic Atrial Fibrillation"
+        },
+        "onsetDateTime": "2019-01-08"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-002-3",
+        "subject": { "reference": "Patient/patient-002" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "73211009", "display": "Diabetes mellitus type 2" }],
+          "text": "Type 2 Diabetes Mellitus"
+        },
+        "onsetDateTime": "2015-07-22"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-002-4",
+        "subject": { "reference": "Patient/patient-002" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "709044004", "display": "Chronic kidney disease" }],
+          "text": "Chronic Kidney Disease Stage 3"
+        },
+        "onsetDateTime": "2020-03-14"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-002-5",
+        "subject": { "reference": "Patient/patient-002" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "38341003", "display": "Hypertension" }],
+          "text": "Hypertension"
+        },
+        "onsetDateTime": "2012-05-09"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-002-1",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "429503005", "display": "Furosemide 40mg" }],
+          "text": "Furosemide 40mg twice daily"
+        },
+        "authoredOn": "2018-04-20"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-002-2",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "372685003", "display": "Carvedilol 25mg" }],
+          "text": "Carvedilol 25mg twice daily"
+        },
+        "authoredOn": "2018-05-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-002-3",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "372715008", "display": "Warfarin 5mg" }],
+          "text": "Warfarin 5mg daily (INR target 2-3)"
+        },
+        "authoredOn": "2019-01-15"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-002-4",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "108476002", "display": "Spironolactone 25mg" }],
+          "text": "Spironolactone 25mg daily"
+        },
+        "authoredOn": "2018-06-10"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-002-5",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "372688001", "display": "Empagliflozin 10mg" }],
+          "text": "Empagliflozin 10mg daily"
+        },
+        "authoredOn": "2021-02-14"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-002-6",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "386913003", "display": "Ramipril 10mg" }],
+          "text": "Ramipril 10mg daily"
+        },
+        "authoredOn": "2018-04-20"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-002-7",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "372912004", "display": "Rosuvastatin 20mg" }],
+          "text": "Rosuvastatin 20mg nightly"
+        },
+        "authoredOn": "2018-07-03"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-002-1",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "6301-6", "display": "INR" }],
+          "text": "INR (Warfarin monitoring)"
+        },
+        "valueQuantity": { "value": 3.8, "unit": "ratio" },
+        "effectiveDateTime": "2025-12-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-002-2",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "2160-0", "display": "Creatinine" }],
+          "text": "Serum Creatinine"
+        },
+        "valueQuantity": { "value": 168, "unit": "umol/L" },
+        "effectiveDateTime": "2025-12-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-002-3",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "2823-3", "display": "Potassium" }],
+          "text": "Serum Potassium"
+        },
+        "valueQuantity": { "value": 5.6, "unit": "mmol/L" },
+        "effectiveDateTime": "2025-12-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-002-4",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "4548-4", "display": "HbA1c" }],
+          "text": "Hemoglobin A1c"
+        },
+        "valueQuantity": { "value": 7.4, "unit": "%" },
+        "effectiveDateTime": "2025-06-10"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-002-5",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "33747-0", "display": "eGFR" }],
+          "text": "eGFR (CKD-EPI)"
+        },
+        "valueQuantity": { "value": 38, "unit": "mL/min/1.73m2" },
+        "effectiveDateTime": "2025-12-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-002-6",
+        "subject": { "reference": "Patient/patient-002" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "2093-3", "display": "Total Cholesterol" }],
+          "text": "Total Cholesterol"
+        },
+        "valueQuantity": { "value": 4.2, "unit": "mmol/L" },
+        "effectiveDateTime": "2024-03-18"
+      }
+    }
+  ]
+}

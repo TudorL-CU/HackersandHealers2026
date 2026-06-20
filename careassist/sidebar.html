@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Charted</title>
+  <link rel="stylesheet" href="sidebar.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <svg class="header-icon" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" fill="#EDE9FE"/>
+        <path d="M8 12h8M12 8v8" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <span class="header-wordmark">Charted</span>
+    </div>
+    <span class="header-patient-name" id="header-patient-name">No patient selected</span>
+  </header>
+
+  <!-- Patient picker -->
+  <section class="section" id="picker-section">
+    <label class="section-label">SELECT PATIENT</label>
+    <select id="patient-select" class="patient-select">
+      <option value="">— Choose a patient —</option>
+      <option value="patient_001">Tremblay, Margaret — F, 78</option>
+      <option value="patient_002">Kowalski, Robert — M, 62</option>
+      <option value="patient_003">Nguyen, Linh — F, 30</option>
+    </select>
+    <button id="analyze-btn" class="btn-analyze" disabled>Analyze Patient</button>
+  </section>
+
+  <!-- Patient info card + lab grid (rendered instantly from FHIR) -->
+  <div id="patient-info" class="hidden">
+    <div class="patient-card">
+      <div class="patient-card-top">
+        <div>
+          <div class="patient-card-name" id="patient-card-name"></div>
+          <div class="patient-card-meta" id="patient-card-meta"></div>
+        </div>
+        <div class="patient-card-badge" id="patient-card-badge"></div>
+      </div>
+      <div class="conditions-wrap" id="conditions-wrap"></div>
+    </div>
+
+    <div class="section-header-row">
+      <label class="section-label">RECENT LABS</label>
+      <span class="overdue-badge" id="overdue-count-badge"></span>
+    </div>
+    <div class="lab-grid" id="lab-grid"></div>
+  </div>
+
+  <!-- Loading (Claude analysis) -->
+  <div id="loading" class="loading hidden">
+    <div class="loading-label">Analyzing with Claude…</div>
+    <div class="skeleton sk-title"></div>
+    <div class="skeleton sk-card"></div>
+    <div class="skeleton sk-card sk-card-sm"></div>
+    <div class="skeleton sk-title" style="margin-top:14px"></div>
+    <div class="skeleton sk-card"></div>
+    <div class="skeleton sk-card sk-card-sm"></div>
+  </div>
+
+  <!-- AI Analysis results -->
+  <div id="results" class="hidden">
+
+    <!-- Summary row -->
+    <section class="section summary-section">
+      <label class="section-label">ANALYSIS SUMMARY</label>
+      <div class="summary-row">
+        <canvas id="summary-donut" width="80" height="80"></canvas>
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <span class="summary-num" id="urgent-count" style="color:#DC2626">0</span>
+            <span class="summary-lbl">Urgent</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-stat">
+            <span class="summary-num" id="attn-count" style="color:#D97706">0</span>
+            <span class="summary-lbl">Attention</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-stat">
+            <span class="summary-num" id="overdue-labs-count" style="color:#6B7280">0</span>
+            <span class="summary-lbl">Overdue labs</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Flags -->
+    <section class="section" id="flags-section">
+      <label class="section-label">FLAGS</label>
+      <div id="flags-container"></div>
+    </section>
+
+    <!-- Actions -->
+    <section class="section" id="actions-section">
+      <label class="section-label">SUGGESTED ACTIONS</label>
+      <div id="actions-container"></div>
+      <div id="action-result" class="action-result hidden">
+        <div class="action-result-header">
+          <span id="action-result-label" class="action-result-title"></span>
+          <button id="action-result-close" class="btn-icon-close" title="Close">✕</button>
+        </div>
+        <div id="action-mini-loading" class="hidden" style="padding:10px 12px">
+          <div class="skeleton sk-card"></div>
+        </div>
+        <div id="action-result-content" class="md-content"></div>
+      </div>
+    </section>
+
+    <!-- Medication safety -->
+    <section class="section" id="med-section">
+      <label class="section-label">MEDICATION SAFETY</label>
+      <div id="medication-note" class="med-note"></div>
+    </section>
+
+  </div><!-- /results -->
+
+  <!-- Ask AI (shown once patient is loaded) -->
+  <section class="section" id="ask-section" style="display:none">
+    <label class="section-label">ASK AI</label>
+    <div class="ask-row">
+      <input id="ask-input" class="ask-input" type="text" placeholder="Ask a question about this patient…" />
+      <button id="ask-btn" class="btn-ask">→</button>
+    </div>
+    <div id="ask-result" class="ask-result hidden"></div>
+  </section>
+
+  <!-- Error -->
+  <div id="error-banner" class="error-banner hidden">
+    <span class="error-icon">⚠</span>
+    <span id="error-text"></span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <button id="new-patient-btn" class="btn-footer">↺ New patient</button>
+    <a href="options.html" target="_blank" class="btn-footer">⚙ Settings</a>
+  </footer>
+
+</div>
+<script src="sidebar.js"></script>
+</body>
+</html>

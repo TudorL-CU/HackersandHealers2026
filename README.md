@@ -1,23 +1,18 @@
-# Continuity Copilot
+# Charted: An AI EMR Helper
+
+
+Sometimes EMR's can be confusing to read and it can take a while to deduct what a patient needs. With Charted, a web extension, you can view any web-based EMR and create a patient profile with a plan on what to address during their appointment.
+
 
 **Longitudinal patient intelligence for primary care clinicians.**
 
-A clinician opens a patient chart and sees one screen with everything they need: who this patient is, what changed since the last visit, what's likely to fall through the cracks, and what to do next. Built for the Hackers & Healers 2026 hackathon.
+By having Charted create condition-specific charts, clinicians can directly see the history of a single condition rather than combing through potentially years worth of irrelevant data in the patients EMR.
 
-## The Problem
 
-Primary care clinicians spend minutes per patient piecing together a longitudinal story from fragmented EHR data. Critical information — overdue referrals, trending lab values, care gaps from covering providers — falls through the cracks. The result: reactive care instead of proactive care.
+**Remove unnecessary tools for EMR analysis**
 
-## The Solution
+Clinicians often use third party tools like Heidi to generate EMR summaries. However, this slows workflow as clinicians have to work through a separate app and copy-paste EMR data. By integrating a web extension directly, clinicians can analyze EMR's without the need for additional tools.
 
-Continuity Copilot connects to a FHIR R4 server, pulls a patient's full record (conditions, encounters, medications, labs, care plans, allergies), and runs a multi-stage AI analysis pipeline:
-
-1. **Patient Story** — A concise longitudinal summary of who this patient is
-2. **What Changed** — Clinically significant changes since the last visit
-3. **What Needs Attention** — Risks likely to fall through the cracks
-4. **Recommended Actions** — Concrete, actionable next steps for the clinician
-
-All four sections appear on a single screen, designed for a 30-second pre-visit review.
 
 ## Architecture
 

@@ -7,6 +7,18 @@ const $ = (id) => document.getElementById(id);
 let currentPatientId = null;
 let currentPageText = null;
 
+// ── Tab switching ──────────────────────────────────────────────────────────
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => (p.style.display = 'none'));
+    btn.classList.add('active');
+    $(`panel-${tab}`).style.display = 'block';
+  });
+});
+
 // --- Analyze Page ---
 
 $('analyzePageBtn').addEventListener('click', async () => {
@@ -48,6 +60,8 @@ $('analyzePageBtn').addEventListener('click', async () => {
     }
 
     const data = await res.json();
+    currentPatientId = null;
+    currentPageText = response.text;
     renderResults(data, { id: 'page', name: data.summary.patient_name, birthDate: '-', gender: '-' });
   } catch (err) {
     $('error').textContent = `Error: ${err.message}`;
@@ -61,7 +75,7 @@ $('analyzePageBtn').addEventListener('click', async () => {
 
 // ── Search ────────────────────────────────────────────────────────────────
 
-$('searchForm').addEventListener('submit', async (e) => {
+$('searchForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const query = $('searchInput').value.trim();
   const btn = $('searchBtn');
@@ -140,9 +154,24 @@ function renderResults(data, patient) {
     $('visitBanner').style.display = 'block';
     $('visitBannerDate').textContent = visit_date ? `📅 ${visit_date}` : '';
     const reason = visit_reason || '';
-    const truncated = reason.length > 72 ? reason.slice(0, 69).replace(/\s\S*$/, '') + '…' : reason;
-    $('visitBannerReason').textContent = truncated;
-    $('visitBannerReason').title = reason; // full text on hover
+    const REASON_LIMIT = 48;
+    const reasonEl = $('visitBannerReason');
+    const reasonToggle = $('visitReasonToggle');
+    if (reason.length > REASON_LIMIT) {
+      const short = reason.slice(0, REASON_LIMIT).replace(/\s\S*$/, '') + '…';
+      reasonEl.textContent = short;
+      reasonToggle.style.display = 'inline';
+      reasonToggle.textContent = 'more';
+      let expanded = false;
+      reasonToggle.onclick = () => {
+        expanded = !expanded;
+        reasonEl.textContent = expanded ? reason : short;
+        reasonToggle.textContent = expanded ? 'less' : 'more';
+      };
+    } else {
+      reasonEl.textContent = reason;
+      reasonToggle.style.display = 'none';
+    }
   } else {
     $('visitBanner').style.display = 'none';
   }
@@ -164,15 +193,23 @@ function renderResults(data, patient) {
 function renderThisVisitTab(summary) {
   const { visit_date, visit_reason, risks = [], actions = [], lab_trends = {}, conditions_timeline = [], changes = [], alerts = [], questions = [] } = summary;
 
-  // Care gap alerts
+  // Care gap alerts (collapsible, start collapsed)
   const alertsSection = $('alertsSection');
   const alertsList = $('alertsList');
   alertsList.innerHTML = '';
+  alertsList.style.display = 'none';
   if (alerts.length > 0) {
     alertsSection.style.display = 'block';
+    $('alertsCount').textContent = `(${alerts.length})`;
     for (const alert of alerts) {
       alertsList.appendChild(buildAlertChip(alert));
     }
+    const toggleBtn = $('alertsToggleBtn');
+    toggleBtn.onclick = () => {
+      const open = alertsList.style.display !== 'none';
+      alertsList.style.display = open ? 'none' : 'block';
+      $('alertsChevron').textContent = open ? '▶' : '▼';
+    };
   } else {
     alertsSection.style.display = 'none';
   }
@@ -242,25 +279,27 @@ function renderThisVisitTab(summary) {
 }
 
 function getVisitRisks(risks, visitReason, visitDate) {
-  // AI-tagged as relevant
+  // Primary: AI-tagged as relevant to this specific visit
   const aiRelevant = risks.filter(r => r.relevant_to_visit);
 
-  // Rule-based: HIGH confidence risks are always surfaced, plus keyword match
+  // Secondary: keyword match on visit reason (only if AI didn't tag enough)
   const keywords = visitReason
     ? visitReason.toLowerCase().split(/[\s,;:.]+/).filter(w => w.length > 4)
     : [];
-  const ruleRelevant = risks.filter(r => {
+  const keywordRelevant = risks.filter(r => {
     if (aiRelevant.includes(r)) return false;
-    if (r.confidence === 'HIGH') return true;
     if (!keywords.length) return false;
     const text = ((r.issue || '') + ' ' + (r.evidence || '')).toLowerCase();
     return keywords.some(kw => text.includes(kw));
   });
 
-  // Merge: AI first, then rule-based, deduplicated, max 4
-  const merged = [...aiRelevant, ...ruleRelevant].slice(0, 4);
-  // Fallback: just show top 3 risks if nothing matched
-  return merged.length > 0 ? merged : risks.slice(0, 3);
+  const combined = [...aiRelevant, ...keywordRelevant].slice(0, 4);
+
+  // Fallback: if nothing matched at all, show top 2 HIGH risks only
+  if (combined.length === 0) {
+    return risks.filter(r => r.confidence === 'HIGH').slice(0, 2);
+  }
+  return combined;
 }
 
 // ── Full Chart tab ────────────────────────────────────────────────────────
@@ -313,26 +352,6 @@ function renderFullChartTab(summary) {
     labGrid.innerHTML = '';
     if (hasBP) labGrid.appendChild(buildBPCard(lab_trends['Systolic BP'], lab_trends['Diastolic BP']));
     for (const key of labKeys.filter(k => k !== 'Systolic BP' && k !== 'Diastolic BP')) {
-
-  // ── Conditions timeline ─────────────────────────────────────────────────
-  if (hasConds) {
-    const lbl = document.createElement('div');
-    lbl.className = 'charts-section-label';
-    lbl.textContent = 'Conditions Timeline';
-    section.appendChild(lbl);
-    section.appendChild(buildConditionsCard(conditions_timeline));
-  }
-
-  // ── Lab charts ──────────────────────────────────────────────────────────
-  if (hasLabs) {
-    const lbl = document.createElement('div');
-    lbl.className = 'charts-section-label';
-    lbl.textContent = 'Lab Trends';
-    section.appendChild(lbl);
-
-    const labGrid = document.createElement('div');
-    labGrid.className = 'lab-grid';
-    for (const key of labKeys) {
       labGrid.appendChild(buildLabCard(key, lab_trends[key]));
     }
 
@@ -650,7 +669,6 @@ function drawBPChart(canvas, sysPoints, diaPoints, dpr) {
   ctx.fillStyle = '#9CA3AF'; ctx.font = `${7 * dpr}px Inter, sans-serif`;
   ctx.textAlign = 'left'; ctx.fillText(sysPoints[0].date.slice(0, 7), PAD.left, H - 3 * dpr);
   ctx.textAlign = 'right'; ctx.fillText(sysPoints[sysPoints.length - 1].date.slice(0, 7), W - PAD.right, H - 3 * dpr);
-  section.style.display = 'block';
 }
 
 function buildLabCard(label, points) {
@@ -782,115 +800,6 @@ function buildConditionsCard(conditions) {
   });
   card.appendChild(chips);
   return card;
-}
-
-function renderStory(story) {
-  const needsTruncate = story.length > STORY_PREVIEW_LENGTH;
-  const preview = needsTruncate
-    ? story.slice(0, STORY_PREVIEW_LENGTH).replace(/\s+\S*$/, '') + '...'
-    : story;
-
-  $('storyPreview').textContent = preview;
-  $('storyFull').textContent = story;
-
-  const toggle = $('storyToggle');
-  if (needsTruncate) {
-    toggle.style.display = 'inline';
-    toggle.textContent = 'Read more';
-    let expanded = false;
-    toggle.onclick = () => {
-      expanded = !expanded;
-      $('storyPreview').style.display = expanded ? 'none' : 'block';
-      $('storyFull').style.display = expanded ? 'block' : 'none';
-      toggle.textContent = expanded ? 'Show less' : 'Read more';
-    };
-  } else {
-    toggle.style.display = 'none';
-  }
-  $('storyPreview').style.display = 'block';
-  $('storyFull').style.display = 'none';
-}
-
-function renderList(key, items, icon, color) {
-  const list = $(`${key}List`);
-  const toggle = $(`${key}Toggle`);
-  list.innerHTML = '';
-
-  const visible = items.slice(0, PREVIEW_COUNT);
-  const hidden = items.slice(PREVIEW_COUNT);
-
-  for (const item of visible) {
-    list.appendChild(createListItem(item, icon, color));
-  }
-
-  if (hidden.length > 0) {
-    const hiddenEls = [];
-    for (const item of hidden) {
-      const li = createListItem(item, icon, color);
-      li.style.display = 'none';
-      li.classList.add(`${key}-hidden`);
-      list.appendChild(li);
-      hiddenEls.push(li);
-    }
-
-    toggle.style.display = 'inline';
-    toggle.textContent = `Show ${hidden.length} more`;
-    let expanded = false;
-    toggle.onclick = () => {
-      expanded = !expanded;
-      hiddenEls.forEach((el) => (el.style.display = expanded ? 'flex' : 'none'));
-      toggle.textContent = expanded ? 'Show less' : `Show ${hidden.length} more`;
-    };
-  } else {
-    toggle.style.display = 'none';
-  }
-}
-
-function renderActions(items) {
-  const list = $('actionsList');
-  const toggle = $('actionsToggle');
-  list.innerHTML = '';
-
-  const visible = items.slice(0, PREVIEW_COUNT);
-  const hidden = items.slice(PREVIEW_COUNT);
-
-  for (const item of visible) {
-    list.appendChild(createActionItem(item));
-  }
-
-  if (hidden.length > 0) {
-    const hiddenEls = [];
-    for (const item of hidden) {
-      const li = createActionItem(item);
-      li.style.display = 'none';
-      li.classList.add('actions-hidden');
-      list.appendChild(li);
-      hiddenEls.push(li);
-    }
-
-    toggle.style.display = 'inline';
-    toggle.textContent = `Show ${hidden.length} more`;
-    let expanded = false;
-    toggle.onclick = () => {
-      expanded = !expanded;
-      hiddenEls.forEach((el) => (el.style.display = expanded ? 'flex' : 'none'));
-      toggle.textContent = expanded ? 'Show less' : `Show ${hidden.length} more`;
-    };
-  } else {
-    toggle.style.display = 'none';
-  }
-}
-
-function createListItem(text, icon, color) {
-  const li = document.createElement('li');
-  li.innerHTML = `<span class="item-icon ${color}">${icon}</span><span>${text}</span>`;
-  return li;
-}
-
-function createActionItem(text) {
-  const li = document.createElement('li');
-  li.innerHTML = `<input type="checkbox" class="item-checkbox" /><span>${text}</span>`;
-  return li;
 }
 
 // --- Condition Detail ---
@@ -1026,7 +935,7 @@ function renderConditionDetail(data) {
       const detail = document.createElement('div');
       detail.style.cssText = `padding:0 10px 8px 10px;display:${i === 0 ? 'block' : 'none'}`;
       detail.innerHTML = `
-        ${v.provider ? `<div style="font-size:10px;color:#9CA3AF;margin-bottom:2px">${v.provider}</div>` : ''}
+        ${v.provider && !/^unknown$/i.test(v.provider.trim()) ? `<div style="font-size:10px;color:#9CA3AF;margin-bottom:2px">${v.provider}</div>` : ''}
         <div style="font-size:12px;color:#374151;line-height:1.55">${v.findings}</div>
         ${v.metrics ? `<div style="font-size:11px;color:#6366F1;margin-top:3px;font-weight:500">${v.metrics}</div>` : ''}
       `;

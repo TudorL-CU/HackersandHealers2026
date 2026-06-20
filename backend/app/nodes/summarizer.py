@@ -1,7 +1,7 @@
-from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage
 
-llm = ChatOpenAI(model="gpt-4o", max_tokens=1024)
+llm = ChatAnthropic(model="claude-sonnet-4-6", max_tokens=1024)
 
 SYSTEM_PROMPT = """You are a clinical summarization assistant for primary care physicians.
 Given a patient's complete medical timeline, produce a concise longitudinal patient story.

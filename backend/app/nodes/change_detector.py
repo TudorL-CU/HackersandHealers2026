@@ -1,7 +1,7 @@
-from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage
 
-llm = ChatOpenAI(model="gpt-4o", max_tokens=1024)
+llm = ChatAnthropic(model="claude-sonnet-4-6", max_tokens=1024)
 
 SYSTEM_PROMPT = """You are a clinical change detection assistant for primary care.
 Given a patient's medical timeline, identify what has CHANGED since their previous visit.
@@ -27,13 +27,13 @@ async def detect_changes(timeline: str) -> list[str]:
         SystemMessage(content=SYSTEM_PROMPT),
         HumanMessage(content=f"Patient timeline:\n\n{timeline}"),
     ])
-    import json
-    try:
-        return json.loads(response.content)
-    except json.JSONDecodeError:
-        text = response.content
-        start = text.find("[")
-        end = text.rfind("]") + 1
-        if start != -1 and end > start:
+    import json, re
+    text = re.sub(r"```(?:json)?\s*", "", response.content).replace("```", "").strip()
+    start = text.find("[")
+    end = text.rfind("]") + 1
+    if start != -1 and end > start:
+        try:
             return json.loads(text[start:end])
-        return [response.content]
+        except json.JSONDecodeError:
+            pass
+    return [response.content]

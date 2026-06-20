@@ -84,6 +84,8 @@ async def run_copilot(request: CopilotRequest):
         "changes": [],
         "risks": [],
         "actions": [],
+        "questions": [],
+        "alerts": [],
     }
     result = await copilot_graph.ainvoke(initial_state)
 
@@ -104,6 +106,10 @@ async def run_copilot(request: CopilotRequest):
             lab_trends=lab_trends,
             conditions_timeline=conditions_timeline,
             medication_count=med_count,
+            visit_date=patient_record.visit_date,
+            visit_reason=patient_record.visit_reason,
+            questions=result.get("questions", []),
+            alerts=result.get("alerts", []),
         ),
         sources=[f"FHIR Server: Patient/{request.patient_id}"],
         processing_time_seconds=round(elapsed, 2),
@@ -130,6 +136,8 @@ async def analyze_page(request: PageAnalysisRequest):
         "changes": [],
         "risks": [],
         "actions": [],
+        "questions": [],
+        "alerts": [],
     }
     result = await copilot_graph.ainvoke(initial_state)
 
@@ -149,6 +157,10 @@ async def analyze_page(request: PageAnalysisRequest):
             lab_trends=lab_trends,
             conditions_timeline=conditions_timeline,
             medication_count=0,
+            visit_date=patient_record.visit_date,
+            visit_reason=patient_record.visit_reason,
+            questions=result.get("questions", []),
+            alerts=result.get("alerts", []),
         ),
         sources=[request.page_url or "Current browser tab"],
         processing_time_seconds=round(elapsed, 2),

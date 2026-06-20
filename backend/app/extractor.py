@@ -79,6 +79,8 @@ class PatientRecord:
     labs: dict[str, list[LabReading]] = field(default_factory=dict)
     encounters: list[str] = field(default_factory=list)  # "YYYY-MM-DD: type"
     allergies: list[str] = field(default_factory=list)
+    visit_date: str = ""
+    visit_reason: str = ""
 
 
 # ── FHIR extraction ─────────────────────────────────────────────────────────
@@ -202,6 +204,10 @@ def extract_from_fhir(record: dict) -> PatientRecord:
             enc_type = codings[0].get("display", enc["type"][0].get("text", "Visit")) if codings else "Visit"
         pr.encounters.append(f"{enc_date}: {enc_type}")
 
+    # Visit date: most recent encounter start date
+    enc_dates = [enc.get("period", {}).get("start", "")[:10] for enc in record.get("encounters", [])]
+    pr.visit_date = max((d for d in enc_dates if d), default="")
+
     return pr
 
 
@@ -225,6 +231,12 @@ _COND_RE = re.compile(
     r"([A-Z][^(\n]{2,60}?)\s*\([A-Z0-9][A-Z0-9.\-]+\)\s*[—\-–]\s*(\d{4})",
     re.MULTILINE,
 )
+_VISIT_REASON_RES = [
+    re.compile(r"Assessment[:\s]+([^\n]{15,300})", re.IGNORECASE),
+    re.compile(r"Chief\s+Complaint[:\s]+([^\n]{10,200})", re.IGNORECASE),
+    re.compile(r"Reason\s+for\s+[Vv]isit[:\s]+([^\n]{10,200})", re.IGNORECASE),
+    re.compile(r"Presenting\s+[Cc]oncern[:\s]+([^\n]{10,200})", re.IGNORECASE),
+]
 
 
 def extract_from_page_text(text: str, page_title: str = "") -> PatientRecord:
@@ -288,6 +300,19 @@ def extract_from_page_text(text: str, page_title: str = "") -> PatientRecord:
                     ))
 
     pr.labs = _dedup_and_sort(raw_labs)
+
+    # Visit date: most recent encounter date (first date found in page text)
+    all_dates = _DATE_RE.findall(text)
+    if all_dates:
+        pr.visit_date = max(all_dates)  # most recent
+
+    # Visit reason: first match across priority-ordered patterns
+    for pattern in _VISIT_REASON_RES:
+        m = pattern.search(text)
+        if m:
+            pr.visit_reason = m.group(1).strip()
+            break
+
     return pr
 
 
@@ -374,6 +399,15 @@ def format_for_llm(pr: PatientRecord) -> str:
     """
     lines: list[str] = []
     today = date.today().isoformat()
+
+    if pr.visit_date or pr.visit_reason:
+        lines.append("## Current Visit Context")
+        if pr.visit_date:
+            lines.append(f"Visit date: {pr.visit_date}")
+        if pr.visit_reason:
+            lines.append(f"Reason for visit: {pr.visit_reason}")
+        lines.append("(Risks and actions relevant to THIS visit should be flagged with relevant_to_visit: true)")
+        lines.append("")
 
     lines.append("## Patient")
     lines.append(f"Name: {pr.patient_name}")

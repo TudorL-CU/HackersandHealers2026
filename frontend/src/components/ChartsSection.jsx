@@ -190,7 +190,7 @@ function LabWidget({ label, points }) {
 // ── Conditions timeline widget ─────────────────────────────────────────────
 const COND_COLORS = ['#3B82F6','#EF4444','#10B981','#F59E0B','#8B5CF6','#EC4899','#14B8A6','#F97316','#6366F1','#84CC16']
 
-function ConditionsWidget({ conditions }) {
+function ConditionsWidget({ conditions, onSelectCondition }) {
   const [showAll, setShowAll] = useState(false)
   if (!conditions?.length) return null
 
@@ -242,16 +242,20 @@ function ConditionsWidget({ conditions }) {
       {/* Chips */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
         {visible.map((c, i) => (
-          <div key={i} style={{
+          <button key={i} onClick={() => onSelectCondition?.(c.name)} style={{
             display: 'flex', alignItems: 'center', gap: 5,
             background: 'white',
             border: `1px solid ${COND_COLORS[i % COND_COLORS.length]}40`,
             borderRadius: 20, padding: '4px 10px',
-          }}>
+            cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = `${COND_COLORS[i % COND_COLORS.length]}15`; e.currentTarget.style.borderColor = COND_COLORS[i % COND_COLORS.length] }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.borderColor = `${COND_COLORS[i % COND_COLORS.length]}40` }}
+          >
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: COND_COLORS[i % COND_COLORS.length], flexShrink: 0 }} />
             <span style={{ fontSize: 12, color: '#374151', fontWeight: 500 }}>{c.name}</span>
             <span style={{ fontSize: 10, color: '#9CA3AF' }}>{c.onset.slice(0,4)}</span>
-          </div>
+          </button>
         ))}
         {sorted.length > 8 && !showAll && (
           <button onClick={() => setShowAll(true)} style={{
@@ -287,7 +291,7 @@ function StatWidget({ value, label, color, bg, icon }) {
 }
 
 // ── Main export ────────────────────────────────────────────────────────────
-export default function ChartsSection({ summary }) {
+export default function ChartsSection({ summary, onSelectCondition }) {
   const {
     lab_trends = {},
     conditions_timeline = [],
@@ -350,7 +354,7 @@ export default function ChartsSection({ summary }) {
           }}>
             Conditions Timeline
           </div>
-          <ConditionsWidget conditions={conditions_timeline} />
+          <ConditionsWidget conditions={conditions_timeline} onSelectCondition={onSelectCondition} />
         </>
       )}
 

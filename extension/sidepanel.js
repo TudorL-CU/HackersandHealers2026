@@ -4,12 +4,15 @@ const STORY_PREVIEW_LENGTH = 180;
 
 const $ = (id) => document.getElementById(id);
 
+let currentPatientId = null;
+let currentPageText = null;
+
 // --- Analyze Page ---
 
 $('analyzePageBtn').addEventListener('click', async () => {
   const btn = $('analyzePageBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="analyze-icon">&#9672;</span> Reading page...';
+  btn.textContent = 'Reading...';
   $('results').style.display = 'none';
   $('error').style.display = 'none';
 
@@ -30,7 +33,7 @@ $('analyzePageBtn').addEventListener('click', async () => {
       throw new Error('Not enough text content found on this page. Open a patient document and try again.');
     }
 
-    btn.innerHTML = '<span class="analyze-icon">&#9672;</span> Analyzing...';
+    btn.textContent = 'Analyzing...';
     $('loading').style.display = 'block';
 
     const res = await fetch(`${API_BASE}/analyze-page`, {
@@ -49,6 +52,8 @@ $('analyzePageBtn').addEventListener('click', async () => {
     }
 
     const data = await res.json();
+    currentPatientId = null;
+    currentPageText = response.text;
     renderResults(data, {
       id: 'page',
       name: data.summary.patient_name,
@@ -60,72 +65,11 @@ $('analyzePageBtn').addEventListener('click', async () => {
     $('error').style.display = 'block';
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<span class="analyze-icon">&#9672;</span> Analyze This Page';
+    btn.textContent = 'Analyze Patient';
     $('loading').style.display = 'none';
   }
 });
 
-// --- Search ---
-
-$('searchForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const query = $('searchInput').value.trim();
-  const btn = $('searchBtn');
-  btn.disabled = true;
-  btn.textContent = 'Searching...';
-  $('searchResults').innerHTML = '';
-
-  try {
-    const params = new URLSearchParams({ count: '10' });
-    if (query && /^\d+$/.test(query)) {
-      params.set('id', query);
-    } else if (query) {
-      params.set('name', query);
-    }
-
-    const res = await fetch(`${API_BASE}/patients?${params}`);
-    const data = await res.json();
-    renderSearchResults(data.patients || []);
-  } catch {
-    $('searchResults').innerHTML = '<div class="no-results">Search failed. Is the backend running?</div>';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Search';
-  }
-});
-
-function renderSearchResults(patients) {
-  const container = $('searchResults');
-  if (patients.length === 0) {
-    container.innerHTML = '<div class="no-results">No patients found.</div>';
-    return;
-  }
-
-  let html = `<div class="search-result-count">${patients.length} patient(s) found</div>`;
-  for (const p of patients) {
-    html += `
-      <button class="patient-btn" data-id="${p.id}" data-name="${p.name}" data-dob="${p.birthDate}" data-gender="${p.gender}">
-        <div>
-          <div class="patient-btn-name">${p.name}</div>
-          <div class="patient-btn-meta">DOB: ${p.birthDate} | ${p.gender}</div>
-        </div>
-        <span class="patient-btn-id">ID: ${p.id}</span>
-      </button>
-    `;
-  }
-  container.innerHTML = html;
-
-  container.querySelectorAll('.patient-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      runCopilot({
-        id: btn.dataset.id,
-        name: btn.dataset.name,
-        birthDate: btn.dataset.dob,
-        gender: btn.dataset.gender,
-      });
-    });
-  });
-}
 
 // --- Copilot ---
 
@@ -147,6 +91,8 @@ async function runCopilot(patient) {
     }
 
     const data = await res.json();
+    currentPatientId = patient.id;
+    currentPageText = null;
     renderResults(data, patient);
   } catch (err) {
     $('error').textContent = `Error: ${err.message}`;
@@ -162,7 +108,8 @@ function renderResults(data, patient) {
   const { summary, processing_time_seconds } = data;
 
   $('patientName').textContent = summary.patient_name;
-  $('patientMeta').textContent = `${patient.birthDate} | ${patient.gender} | ID: ${patient.id}`;
+  const metaParts = [patient.birthDate, patient.gender].filter(v => v && v !== '-');
+  $('patientMeta').textContent = metaParts.length > 0 ? metaParts.join(' | ') : '';
   $('analysisTime').textContent = `${processing_time_seconds}s`;
 
   // Charts & widgets
@@ -230,28 +177,15 @@ function renderCharts(summary) {
     return;
   }
 
-  // ── Stat pills ──────────────────────────────────────────────────────────
-  const statDefs = [
-    { value: conditions_timeline.length || '—', label: 'Conditions', color: '#6366F1', bg: '#EEF2FF', icon: '📋' },
-    { value: risks.length, label: 'Risk Flags', color: '#EF4444', bg: '#FEF2F2', icon: '⚠️' },
-    { value: actions.length, label: 'Actions', color: '#10B981', bg: '#ECFDF5', icon: '✅' },
-    { value: changes.length, label: 'Changes', color: '#D97706', bg: '#FFFBEB', icon: '🔄' },
-  ];
 
-  const statGrid = document.createElement('div');
-  statGrid.className = 'stat-grid';
-  for (const s of statDefs) {
-    const pill = document.createElement('div');
-    pill.className = 'stat-pill';
-    pill.style.cssText = `background:${s.bg};border-top-color:${s.color};border-color:${s.color}20;`;
-    pill.innerHTML = `
-      <div style="font-size:16px;margin-bottom:2px">${s.icon}</div>
-      <div style="font-size:20px;font-weight:800;color:${s.color};line-height:1;letter-spacing:-0.05em">${s.value}</div>
-      <div style="font-size:10px;color:#6B7280;font-weight:500;margin-top:2px">${s.label}</div>
-    `;
-    statGrid.appendChild(pill);
+  // ── Conditions timeline ─────────────────────────────────────────────────
+  if (hasConds) {
+    const lbl = document.createElement('div');
+    lbl.className = 'charts-section-label';
+    lbl.textContent = 'Conditions Timeline';
+    section.appendChild(lbl);
+    section.appendChild(buildConditionsCard(conditions_timeline));
   }
-  section.appendChild(statGrid);
 
   // ── Lab charts ──────────────────────────────────────────────────────────
   if (hasLabs) {
@@ -266,15 +200,6 @@ function renderCharts(summary) {
       labGrid.appendChild(buildLabCard(key, lab_trends[key]));
     }
     section.appendChild(labGrid);
-  }
-
-  // ── Conditions timeline ─────────────────────────────────────────────────
-  if (hasConds) {
-    const lbl = document.createElement('div');
-    lbl.className = 'charts-section-label';
-    lbl.textContent = 'Conditions Timeline';
-    section.appendChild(lbl);
-    section.appendChild(buildConditionsCard(conditions_timeline));
   }
 
   section.style.display = 'block';
@@ -446,7 +371,7 @@ function buildConditionsCard(conditions) {
   const chips = document.createElement('div');
   chips.className = 'cond-chips';
   sorted.forEach((c, i) => {
-    const chip = document.createElement('div');
+    const chip = document.createElement('button');
     chip.className = 'cond-chip';
     chip.style.cssText = `border:1px solid ${COND_COLORS[i % COND_COLORS.length]}40;`;
     chip.innerHTML = `
@@ -454,6 +379,7 @@ function buildConditionsCard(conditions) {
       <span style="font-size:11px;color:#374151;font-weight:500">${c.name}</span>
       <span style="font-size:9px;color:#9CA3AF">${c.onset.slice(0, 4)}</span>
     `;
+    chip.addEventListener('click', () => showConditionDetail(c.name));
     chips.appendChild(chip);
   });
   card.appendChild(chips);
@@ -568,4 +494,168 @@ function createActionItem(text) {
   const li = document.createElement('li');
   li.innerHTML = `<input type="checkbox" class="item-checkbox" /><span>${text}</span>`;
   return li;
+}
+
+// --- Condition Detail ---
+
+const STATUS_COLORS = {
+  improving: '#10B981',
+  stable: '#3B82F6',
+  worsening: '#EF4444',
+  new_finding: '#F59E0B',
+};
+const STATUS_LABELS = {
+  improving: 'Improving',
+  stable: 'Stable',
+  worsening: 'Worsening',
+  new_finding: 'New Finding',
+};
+
+async function showConditionDetail(conditionName) {
+  $('results').style.display = 'none';
+  $('conditionDetail').style.display = 'block';
+  $('conditionHeader').innerHTML = `
+    <div style="padding:14px 16px;display:flex;align-items:center;gap:10px;background:white;border-radius:10px 10px 0 0;margin-top:12px;border-bottom:1px solid #E5E7EB">
+      <button id="conditionBackBtnInner" style="background:none;border:none;font-size:18px;cursor:pointer;color:#6366F1;padding:0;line-height:1">←</button>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:#111827">${conditionName}</div>
+      </div>
+    </div>
+  `;
+  $('conditionBackBtnInner').addEventListener('click', () => {
+    $('conditionDetail').style.display = 'none';
+    $('results').style.display = 'block';
+  });
+  $('conditionLoading').style.display = 'block';
+  $('conditionContent').innerHTML = '';
+
+  try {
+    const body = { condition_name: conditionName };
+    if (currentPatientId) body.patient_id = currentPatientId;
+    else if (currentPageText) body.page_text = currentPageText;
+
+    const res = await fetch(`${API_BASE}/condition-detail`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Error ${res.status}`);
+    }
+
+    const data = await res.json();
+    renderConditionDetail(data);
+  } catch (err) {
+    $('conditionContent').innerHTML = `<div style="padding:14px 16px;color:#b91c1c;font-size:13px">Error: ${err.message}</div>`;
+  } finally {
+    $('conditionLoading').style.display = 'none';
+  }
+}
+
+function renderConditionDetail(data) {
+  const container = $('conditionContent');
+  container.innerHTML = '';
+
+  // Status banner — the most important thing, big and clear
+  if (data.current_status) {
+    const statusEl = document.createElement('div');
+    statusEl.style.cssText = `
+      margin: 0; padding: 14px 16px;
+      background: linear-gradient(135deg, #EEF2FF, #F0F4FF);
+      border-bottom: 1px solid #C7D2FE;
+      display: flex; align-items: center; gap: 10px;
+    `;
+    statusEl.innerHTML = `
+      <div style="width:10px;height:10px;border-radius:50%;background:#6366F1;flex-shrink:0"></div>
+      <div style="font-size:14px;font-weight:600;color:#1E40AF">${data.current_status}</div>
+    `;
+    container.appendChild(statusEl);
+  }
+
+  // Summary — one line, subtle
+  if (data.condition_summary) {
+    const summaryEl = document.createElement('div');
+    summaryEl.style.cssText = 'padding:10px 16px;font-size:12px;color:#6B7280;line-height:1.6;background:white;border-bottom:1px solid #F3F4F6';
+    summaryEl.textContent = data.condition_summary;
+    container.appendChild(summaryEl);
+  }
+
+  // Care gaps — red alert cards
+  const gaps = data.gaps_in_care || [];
+  if (gaps.length > 0) {
+    const gapsEl = document.createElement('div');
+    gapsEl.style.cssText = 'padding:10px 16px;background:#FEF2F2;border-bottom:1px solid #FECACA';
+    let gapsHtml = `<div style="font-size:10px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">⚠ Gaps (${gaps.length})</div>`;
+    gaps.forEach(g => {
+      gapsHtml += `<div style="font-size:12px;color:#7F1D1D;padding:3px 0;line-height:1.5">• ${g}</div>`;
+    });
+    gapsEl.innerHTML = gapsHtml;
+    container.appendChild(gapsEl);
+  }
+
+  // Visit timeline — collapsible cards
+  const visits = (data.visit_progression || []).slice().reverse();
+  if (visits.length > 0) {
+    const timelineEl = document.createElement('div');
+    timelineEl.style.cssText = 'padding:12px 16px;background:white';
+
+    const titleEl = document.createElement('div');
+    titleEl.style.cssText = 'font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px';
+    titleEl.textContent = `${visits.length} visits`;
+    timelineEl.appendChild(titleEl);
+
+    visits.forEach((v, i) => {
+      const color = STATUS_COLORS[v.status] || '#6B7280';
+      const label = STATUS_LABELS[v.status] || v.status;
+
+      const card = document.createElement('div');
+      card.style.cssText = `border-left:3px solid ${color};border-radius:0 6px 6px 0;margin-bottom:6px;background:#FAFBFC;overflow:hidden`;
+
+      const header = document.createElement('button');
+      header.style.cssText = `
+        width:100%;display:flex;justify-content:space-between;align-items:center;
+        padding:8px 10px;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;
+      `;
+      header.innerHTML = `
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:12px;font-weight:700;color:#111827">${v.date}</span>
+          <span style="font-size:10px;color:#9CA3AF">▸</span>
+        </div>
+        <span style="font-size:9px;font-weight:600;color:${color};background:${color}15;padding:2px 6px;border-radius:8px">${label}</span>
+      `;
+
+      const detail = document.createElement('div');
+      detail.style.cssText = `padding:0 10px 8px 10px;display:${i === 0 ? 'block' : 'none'}`;
+      detail.innerHTML = `
+        ${v.provider ? `<div style="font-size:10px;color:#9CA3AF;margin-bottom:2px">${v.provider}</div>` : ''}
+        <div style="font-size:12px;color:#374151;line-height:1.55">${v.findings}</div>
+        ${v.metrics ? `<div style="font-size:11px;color:#6366F1;margin-top:3px;font-weight:500">${v.metrics}</div>` : ''}
+      `;
+
+      if (i === 0) {
+        header.querySelector('span:nth-child(2)') && (header.innerHTML = header.innerHTML.replace('▸', '▾'));
+      }
+
+      header.addEventListener('click', () => {
+        const isOpen = detail.style.display !== 'none';
+        detail.style.display = isOpen ? 'none' : 'block';
+        const arrowSpan = header.querySelector('[style*="9CA3AF"]');
+        if (arrowSpan) arrowSpan.textContent = isOpen ? '▸' : '▾';
+      });
+
+      card.appendChild(header);
+      card.appendChild(detail);
+      timelineEl.appendChild(card);
+    });
+
+    container.appendChild(timelineEl);
+  }
+
+  // Footer
+  const footerEl = document.createElement('div');
+  footerEl.style.cssText = 'padding:8px 16px;font-size:10px;color:#9CA3AF;background:#F9FAFB;border-top:1px solid #E5E7EB;border-radius:0 0 10px 10px';
+  footerEl.textContent = 'AI-generated condition analysis. Verify against patient record.';
+  container.appendChild(footerEl);
 }

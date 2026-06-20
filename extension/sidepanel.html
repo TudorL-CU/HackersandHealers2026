@@ -12,39 +12,12 @@
   <header class="header">
     <div>
       <h1 class="header-title">Continuity Copilot</h1>
-      <p class="header-subtitle">Patient intelligence for primary care</p>
     </div>
-    <div class="header-status">
-      <span class="status-dot"></span> FHIR Connected
-    </div>
+    <button id="analyzePageBtn" class="btn-analyze-sm">Analyze Patient</button>
   </header>
 
   <main class="main">
-    <!-- Analyze Page -->
-    <div class="card analyze-card">
-      <button id="analyzePageBtn" class="btn-analyze">
-        <span class="analyze-icon">&#9672;</span>
-        Analyze This Page
-      </button>
-      <p class="analyze-hint">Reads the patient document open in your current tab</p>
-    </div>
 
-    <!-- Divider -->
-    <div class="divider"><span>or search FHIR</span></div>
-
-    <!-- Search -->
-    <div class="card search-card">
-      <form id="searchForm" class="search-form">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search by name or patient ID..."
-          class="search-input"
-        />
-        <button type="submit" id="searchBtn" class="btn-primary">Search</button>
-      </form>
-      <div id="searchResults" class="search-results"></div>
-    </div>
 
     <!-- Loading -->
     <div id="loading" class="loading-card" style="display:none">
@@ -67,7 +40,7 @@
         <span id="analysisTime" class="analysis-time"></span>
       </div>
 
-      <!-- Charts / Widgets -->
+      <!-- Charts / Conditions Timeline -->
       <div id="chartsSection" class="charts-section" style="display:none"></div>
 
       <!-- Sections (stacked vertically for sidebar) -->
@@ -128,6 +101,16 @@
       <div class="footer">
         AI-generated for clinical decision support. Verify against the patient record.
       </div>
+    </div>
+
+    <!-- Condition Detail Panel -->
+    <div id="conditionDetail" style="display:none">
+      <div id="conditionHeader"></div>
+      <div id="conditionLoading" class="loading-card" style="display:none">
+        <div class="spinner"></div>
+        <div class="loading-title">Analyzing condition...</div>
+      </div>
+      <div id="conditionContent"></div>
     </div>
   </main>
 

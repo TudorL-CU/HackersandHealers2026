@@ -4,28 +4,29 @@ from langchain_core.messages import SystemMessage, HumanMessage
 llm = ChatAnthropic(model="claude-sonnet-4-6", max_tokens=1024)
 
 SYSTEM_PROMPT = """You are a clinical change detection assistant for primary care.
-Given a patient's medical timeline, identify what has CHANGED since their previous visit.
 
-Focus on:
+You will receive a structured patient record where lab values, conditions, medications, and
+encounter dates have already been extracted deterministically. The trend direction and delta
+values are pre-computed for you.
+
+Your job is to identify which changes are CLINICALLY SIGNIFICANT and explain why — not to
+re-read or re-extract the values. Focus on:
+- Lab trends that indicate disease progression or improvement (use the pre-computed deltas)
+- New or changed medications and their clinical context
 - New diagnoses or worsening conditions
-- Medication changes (new, stopped, dose adjustments)
-- Significant lab value changes (trending worse or better)
-- Vital sign trends (especially blood pressure, weight, BMI)
-- Changes in mental health status
-- New referrals or specialist findings
-- Social/life changes that affect health
+- Vital sign trajectories that matter clinically
 
-Return a JSON array of strings, each describing one change. Be specific with values.
-Example: ["HbA1c rose from 7.1% to 7.8%", "New diagnosis: mild diabetic retinopathy"]
+Be specific: reference the exact values that were extracted (e.g. "HbA1c rose from 7.1% to 7.8%").
+Do not invent values that are not in the structured data.
 
-If there is only one encounter or no clear comparison, note what's most clinically
-significant from the most recent visit. Return ONLY the JSON array, no other text."""
+Return a JSON array of strings, each one change. Prioritize by clinical significance.
+Return ONLY the JSON array, no other text."""
 
 
-async def detect_changes(timeline: str) -> list[str]:
+async def detect_changes(structured_context: str) -> list[str]:
     response = await llm.ainvoke([
         SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(content=f"Patient timeline:\n\n{timeline}"),
+        HumanMessage(content=f"Patient record (pre-extracted):\n\n{structured_context}"),
     ])
     import json, re
     text = re.sub(r"```(?:json)?\s*", "", response.content).replace("```", "").strip()

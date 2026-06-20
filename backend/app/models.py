@@ -10,6 +10,10 @@ class PatientSummary(BaseModel):
     risks: list[str]
     actions: list[str]
     confidence: dict[str, str] = {}
+    # Structured data for charts
+    lab_trends: dict[str, list[dict]] = {}
+    conditions_timeline: list[dict] = []
+    medication_count: int = 0
 
 
 class CopilotRequest(BaseModel):

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ChartsSection from './ChartsSection'
 
 export default function CopilotView({ data, patient }) {
   const { summary, processing_time_seconds } = data
@@ -28,6 +29,11 @@ export default function CopilotView({ data, patient }) {
         <div style={{ textAlign: 'right', fontSize: 12, color: 'var(--gray-400)' }}>
           Analysis completed in {processing_time_seconds}s
         </div>
+      </div>
+
+      {/* Charts — stat pills, lab trends, conditions timeline */}
+      <div style={{ padding: '0 24px', borderBottom: '1px solid var(--gray-100)' }}>
+        <ChartsSection summary={summary} />
       </div>
 
       {/* Four-panel grid */}

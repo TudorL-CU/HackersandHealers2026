@@ -1,8 +1,8 @@
 fastapi
 uvicorn
-openai
+anthropic
 langgraph
-langchain-openai
+langchain-anthropic
 langchain-core
 python-dotenv
 httpx

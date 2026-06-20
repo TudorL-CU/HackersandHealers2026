@@ -249,3 +249,103 @@ body {
   color: #9ca3af;
   border-top: 1px solid #e5e7eb;
 }
+
+/* Charts section */
+.charts-section {
+  background: white;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.charts-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.stat-pill {
+  border-radius: 10px;
+  padding: 10px 12px;
+  border-top-width: 3px;
+  border-top-style: solid;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+}
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.lab-card {
+  border-radius: 10px;
+  padding: 10px;
+  border-top-width: 3px;
+  border-top-style: solid;
+}
+.lab-card canvas {
+  width: 100%;
+  display: block;
+  margin-top: 6px;
+}
+.cond-card {
+  background: #F8FAFF;
+  border: 1px solid #C7D2FE;
+  border-top: 3px solid #6366F1;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.cond-timeline {
+  position: relative;
+  height: 28px;
+  margin-bottom: 6px;
+}
+.cond-timeline-line {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #E0E7FF;
+  border-radius: 1px;
+}
+.cond-dot {
+  position: absolute;
+  top: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  transform: translateX(-50%);
+  cursor: default;
+  z-index: 1;
+}
+.cond-years {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: #9CA3AF;
+  margin-bottom: 8px;
+}
+.cond-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.cond-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: white;
+  border-radius: 20px;
+  padding: 3px 8px;
+}

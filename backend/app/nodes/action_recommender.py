@@ -4,39 +4,42 @@ from langchain_core.messages import SystemMessage, HumanMessage
 llm = ChatAnthropic(model="claude-haiku-4-5-20251001", max_tokens=1024)
 
 SYSTEM_PROMPT = """You are a clinical action planning assistant for primary care physicians.
-Given a patient's timeline, the detected changes, and identified risks, recommend
-concrete next actions the clinician should take.
+
+You will receive a structured patient record (pre-extracted data) along with clinically significant
+changes and identified risks. All values have been extracted deterministically — your job is to
+recommend concrete next steps, not to re-read or re-derive the data.
 
 Each action should be:
-- Specific and actionable (not vague advice)
-- Tied to a specific finding or risk
-- Something that can be done NOW or scheduled in the near term
-- Framed as what the CLINICIAN should do, not what the patient should do
+- Specific and actionable — reference the exact finding that drives the action
+- Something the CLINICIAN can do NOW or schedule in the near term
+- Framed from the clinician's perspective (not the patient's)
+- Tied directly to a value or risk from the structured data
 
-Think about: orders to place, referrals to make, follow-ups to schedule, medications
-to adjust, screenings to order, conversations to have with the patient.
+Think about: orders to place, referrals to make, dose adjustments, follow-up scheduling,
+medication safety checks, overdue screenings, conversations to have.
 
-Return a JSON array of strings, each describing one recommended action.
-Prioritize by clinical urgency.
-Example: ["Order HbA1c — last drawn 5 months ago, was trending up"]
+Prioritize by clinical urgency. Use the exact values from the structured context.
 
-Return ONLY the JSON array, no other text."""
+Return a JSON array of strings. Return ONLY the JSON array, no other text."""
 
 
-async def recommend_actions(timeline: str, changes: list[str], risks: list[str]) -> list[str]:
-    context = f"""Patient timeline:
+async def recommend_actions(
+    structured_context: str,
+    changes: list[str],
+    risks: list[str],
+) -> list[str]:
+    human_content = f"""Patient record (pre-extracted):
+{structured_context}
 
-{timeline}
-
-Recent changes detected:
+Clinically significant changes identified:
 {chr(10).join(f'- {c}' for c in changes)}
 
-Identified risks:
+Risks identified:
 {chr(10).join(f'- {r}' for r in risks)}"""
 
     response = await llm.ainvoke([
         SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(content=context),
+        HumanMessage(content=human_content),
     ])
     import json, re
     text = re.sub(r"```(?:json)?\s*", "", response.content).replace("```", "").strip()

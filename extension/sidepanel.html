@@ -18,6 +18,7 @@
 
   <main class="main">
 
+
     <!-- Loading -->
     <div id="loading" class="loading-card" style="display:none">
       <div class="spinner"></div>
@@ -40,58 +41,18 @@
         <span id="analysisTime" class="analysis-time"></span>
       </div>
 
-      <!-- Visit banner (above tabs, always visible) -->
-      <div id="visitBanner" class="visit-banner" style="display:none">
-        <div class="visit-banner-date" id="visitBannerDate"></div>
-        <div class="visit-banner-reason" id="visitBannerReason"></div>
-      </div>
+      <!-- Charts / Conditions Timeline -->
+      <div id="chartsSection" class="charts-section" style="display:none"></div>
 
-      <!-- Tab bar -->
-      <div class="tab-bar">
-        <button class="tab-btn active" data-tab="thisVisit">📍 This Visit</button>
-        <button class="tab-btn" data-tab="fullChart">📋 Full Chart</button>
-      </div>
-
-      <!-- ── This Visit panel ── -->
-      <div id="panel-thisVisit" class="tab-panel">
-
-        <!-- Care gap alerts -->
-        <div id="alertsSection" style="display:none">
-          <div class="panel-section-header">🔔 Care Alerts</div>
-          <div id="alertsList" class="alerts-list"></div>
-        </div>
-
-        <!-- Stat row -->
-        <div id="visitStats" class="visit-stats"></div>
-
-        <!-- Visit-relevant flags -->
-        <div class="panel-section-header">⚠️ Flags for this visit</div>
-        <ul id="visitRisksList" class="risk-list"></ul>
-        <div id="visitRisksEmpty" class="empty-hint" style="display:none">No high-priority flags identified for this visit.</div>
-
-        <!-- Questions to ask -->
-        <div id="questionsSection" style="display:none">
-          <div class="panel-section-header">💬 Questions to ask</div>
-          <ul id="questionsList" class="questions-list"></ul>
-        </div>
-
-        <!-- Actions for today -->
-        <div class="panel-section-header">✅ Actions for today</div>
-        <ul id="visitActionsList" class="item-list"></ul>
-      </div>
-
-      <!-- ── Full Chart panel ── -->
-      <div id="panel-fullChart" class="tab-panel" style="display:none">
-
-        <!-- Lab accordion -->
-        <div id="labAccordion" class="accordion" style="display:none">
-          <button class="accordion-header" id="labAccordionBtn">
-            <span>📈 Lab Trends <span id="labAccordionCount" class="acc-count"></span></span>
-            <span id="labSummaryLine" class="acc-summary"></span>
-            <span class="acc-chevron" id="labChevron">▼</span>
-          </button>
-          <div id="labAccordionContent" class="accordion-content" style="display:none">
-            <div id="labGrid" class="lab-grid"></div>
+      <!-- Sections (stacked vertically for sidebar) -->
+      <div class="sections">
+        <div class="section" id="storySection">
+          <div class="section-header" data-color="blue">
+            <div class="section-dot blue"></div>
+            <div class="section-title-wrap">
+              <h3 class="section-title">Patient Story</h3>
+              <p class="section-subtitle">Who is this patient?</p>
+            </div>
           </div>
         </div>
 
@@ -163,6 +124,16 @@
       <div class="footer">
         AI-generated for clinical decision support. Verify against the patient record.
       </div>
+    </div>
+
+    <!-- Condition Detail Panel -->
+    <div id="conditionDetail" style="display:none">
+      <div id="conditionHeader"></div>
+      <div id="conditionLoading" class="loading-card" style="display:none">
+        <div class="spinner"></div>
+        <div class="loading-title">Analyzing condition...</div>
+      </div>
+      <div id="conditionContent"></div>
     </div>
   </main>
 

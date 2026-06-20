@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import ChartsSection from './ChartsSection'
+import ConditionDetail from './ConditionDetail'
 
 export default function CopilotView({ data, patient }) {
   const { summary, processing_time_seconds } = data
+  const [selectedCondition, setSelectedCondition] = useState(null)
 
   const storyPreview = summary.story.length > 180
     ? summary.story.slice(0, 180).replace(/\s+\S*$/, '') + '...'
@@ -33,8 +35,20 @@ export default function CopilotView({ data, patient }) {
 
       {/* Charts — stat pills, lab trends, conditions timeline */}
       <div style={{ padding: '0 24px', borderBottom: '1px solid var(--gray-100)' }}>
-        <ChartsSection summary={summary} />
+        <ChartsSection summary={summary} onSelectCondition={setSelectedCondition} />
       </div>
+
+      {/* Condition detail drill-down */}
+      {selectedCondition && (
+        <div style={{ padding: '0 24px' }}>
+          <ConditionDetail
+            conditionName={selectedCondition}
+            patientId={patient.id !== 'page' ? patient.id : null}
+            pageText={null}
+            onClose={() => setSelectedCondition(null)}
+          />
+        </div>
+      )}
 
       {/* Four-panel grid */}
       <div style={{

@@ -167,6 +167,49 @@ async def analyze_page(request: PageAnalysisRequest):
     )
 
 
+@app.post("/api/condition-detail")
+async def condition_detail(request: dict):
+    from app.nodes.condition_analyzer import analyze_condition
+
+    condition_name = request.get("condition_name", "")
+    patient_id = request.get("patient_id")
+    page_text = request.get("page_text")
+
+    if not condition_name:
+        raise HTTPException(status_code=400, detail="condition_name is required")
+
+    start = time.time()
+
+    if patient_id:
+        try:
+            record = await get_full_patient_record(patient_id)
+        except Exception as e:
+            raise HTTPException(status_code=404, detail=str(e))
+        patient_record = extract_from_fhir(record)
+    elif page_text:
+        patient_record = extract_from_page_text(page_text, "")
+    else:
+        raise HTTPException(status_code=400, detail="patient_id or page_text required")
+
+    structured_context = format_for_llm(patient_record)
+    result = await analyze_condition(structured_context, condition_name)
+    lab_trends = to_lab_trends(patient_record)
+
+    relevant_lab_names = result.get("relevant_labs", [])
+    filtered_labs = {}
+    for lab_name in relevant_lab_names:
+        for key, points in lab_trends.items():
+            if lab_name.lower() in key.lower():
+                filtered_labs[key] = points
+
+    elapsed = time.time() - start
+    return {
+        **result,
+        "related_lab_trends": filtered_labs,
+        "processing_time_seconds": round(elapsed, 2),
+    }
+
+
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "service": "continuity-copilot"}

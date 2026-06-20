@@ -17,6 +17,12 @@ class CopilotRequest(BaseModel):
     context: Optional[str] = None
 
 
+class PageAnalysisRequest(BaseModel):
+    page_text: str
+    page_title: Optional[str] = None
+    page_url: Optional[str] = None
+
+
 class CopilotResponse(BaseModel):
     summary: PatientSummary
     sources: list[str] = []

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSCAR EMR - Patient Chart: Tremblay, Diane</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; background: #e8e8e8; color: #333; font-size: 13px; }
+
+    .oscar-header {
+      background: linear-gradient(to bottom, #4a6fa5, #2c4a7c);
+      color: white;
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .oscar-header strong { font-size: 14px; }
+    .oscar-nav {
+      background: #f0f0f0;
+      border-bottom: 1px solid #ccc;
+      padding: 4px 12px;
+      display: flex;
+      gap: 2px;
+    }
+    .oscar-nav a {
+      padding: 4px 10px;
+      background: #ddd;
+      border: 1px solid #bbb;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      text-decoration: none;
+      color: #333;
+      font-size: 11px;
+    }
+    .oscar-nav a.active { background: white; font-weight: bold; }
+
+    .oscar-body { display: flex; gap: 0; max-width: 1200px; margin: 0 auto; }
+    .oscar-sidebar {
+      width: 220px;
+      background: #f5f5f5;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      min-height: calc(100vh - 60px);
+    }
+    .oscar-main { flex: 1; background: white; padding: 16px; }
+
+    .sidebar-section { margin-bottom: 14px; }
+    .sidebar-section h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #666;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+    }
+    .sidebar-item { font-size: 12px; padding: 2px 0; color: #444; }
+    .sidebar-item.alert { color: #c00; font-weight: bold; }
+
+    .patient-banner {
+      background: #f0f4ff;
+      border: 1px solid #b0c4de;
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .patient-banner h2 { font-size: 16px; color: #2c4a7c; }
+    .patient-banner .demo-info { font-size: 12px; color: #666; margin-top: 4px; }
+    .patient-banner .demo-right { text-align: right; font-size: 12px; color: #666; }
+
+    .encounter { border: 1px solid #ddd; border-radius: 4px; margin-bottom: 12px; }
+    .encounter-header {
+      background: #f0f0f0;
+      padding: 8px 12px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .encounter-header .date { color: #2c4a7c; }
+    .encounter-body { padding: 10px 12px; }
+    .encounter-body p { margin-bottom: 8px; line-height: 1.6; }
+
+    .vitals-table, .labs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      font-size: 12px;
+    }
+    .vitals-table th, .labs-table th {
+      background: #f5f5f5;
+      text-align: left;
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      font-size: 11px;
+    }
+    .vitals-table td, .labs-table td {
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+    }
+    .flag-high { color: #c00; font-weight: bold; }
+    .flag-normal { color: #090; }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2c4a7c;
+      border-bottom: 2px solid #2c4a7c;
+      padding-bottom: 4px;
+      margin: 16px 0 10px 0;
+    }
+
+    .med-list, .condition-list { margin: 6px 0; }
+    .med-list li, .condition-list li { padding: 3px 0; font-size: 12px; list-style: none; }
+    .med-list li::before { content: "💊 "; }
+    .condition-list li::before { content: "• "; color: #c00; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="oscar-header">
+  <div><strong>OSCAR EMR</strong> — Family Health Team</div>
+  <div>Dr. Marie-Claire Bouchard | Ottawa Family Medicine Clinic | 2026-06-20</div>
+</div>
+
+<div class="oscar-nav">
+  <a href="#">Master File</a>
+  <a class="active" href="#">E-Chart</a>
+  <a href="#">Rx</a>
+  <a href="#">Msg</a>
+  <a href="#">Tickler</a>
+  <a href="#">Forms</a>
+  <a href="#">Labs</a>
+  <a href="#">Prevention</a>
+</div>
+
+<div class="oscar-body">
+  <div class="oscar-sidebar">
+    <div class="sidebar-section">
+      <h4>Active Problems</h4>
+      <div class="sidebar-item">Type 2 Diabetes (E11.9) — 2014</div>
+      <div class="sidebar-item">Essential Hypertension (I10) — 2011</div>
+      <div class="sidebar-item">Hyperlipidemia (E78.5) — 2016</div>
+      <div class="sidebar-item">Osteoporosis (M81.0) — 2021</div>
+      <div class="sidebar-item">MDD, moderate (F32.1) — 2024</div>
+      <div class="sidebar-item">Diabetic Retinopathy (E11.311) — 2025</div>
+      <div class="sidebar-item">Peripheral Neuropathy (G62.9) — 2025</div>
+    </div>
+
+    <div class="sidebar-section">
+      <h4>Allergies</h4>
+      <div class="sidebar-item alert">Penicillin — Rash/hives</div>
+      <div class="sidebar-item alert">Sulfonamides — ANAPHYLAXIS</div>
+    </div>
+
+    <div class="sidebar-section">
+      <h4>Current Medications</h4>
+      <div class="sidebar-item">Metformin 1000mg BID</div>
+      <div class="sidebar-item">Glipizide 5mg daily</div>
+      <div class="sidebar-item">Lisinopril 20mg daily</div>
+      <div class="sidebar-item">Amlodipine 5mg daily</div>
+      <div class="sidebar-item">Atorvastatin 40mg HS</div>
+      <div class="sidebar-item">Alendronate 70mg weekly</div>
+      <div class="sidebar-item">Sertraline 100mg daily</div>
+    </div>
+
+    <div class="sidebar-section">
+      <h4>Preventive Care</h4>
+      <div class="sidebar-item">Mammogram: 2024-11-15</div>
+      <div class="sidebar-item">Colonoscopy: 2021-08-20</div>
+      <div class="sidebar-item">DEXA Scan: 2020-11-03</div>
+      <div class="sidebar-item">Flu Vaccine: 2025-10-01</div>
+      <div class="sidebar-item">Eye Exam: 2025-05-10</div>
+    </div>
+
+    <div class="sidebar-section">
+      <h4>Social History</h4>
+      <div class="sidebar-item">Non-smoker</div>
+      <div class="sidebar-item">Occasional wine</div>
+      <div class="sidebar-item">Retired teacher</div>
+      <div class="sidebar-item">Widowed (Sept 2025)</div>
+      <div class="sidebar-item">Lives alone, son nearby</div>
+      <div class="sidebar-item">French/English bilingual</div>
+    </div>
+  </div>
+
+  <div class="oscar-main">
+    <div class="patient-banner">
+      <div>
+        <h2>TREMBLAY, Diane</h2>
+        <div class="demo-info">DOB: 1956-08-22 (Age 69) | Female | OHIP: 8842-156-783 | MRN: MRN-88421</div>
+      </div>
+      <div class="demo-right">
+        PCP: Dr. Marie-Claire Bouchard<br>
+        Phone: (613) 555-0147<br>
+        Emergency: David Tremblay (Son) (613) 555-0182
+      </div>
+    </div>
+
+    <!-- Most recent encounter -->
+    <div class="section-title">Encounter Notes</div>
+
+    <div class="encounter">
+      <div class="encounter-header">
+        <span class="date">2026-06-10 — Office Visit</span>
+        <span>Provider: Dr. Marie-Claire Bouchard</span>
+      </div>
+      <div class="encounter-body">
+        <p><strong>Reason:</strong> Comprehensive follow-up — first visit back after my medical leave.</p>
+        <p><strong>Subjective:</strong> Patient has not been seen for comprehensive management in 5 months. Reports increased fatigue and occasional blurry vision over the past 2 months. Feet feel "tingly and numb" more often. Has been taking all medications but missed amlodipine several times due to confusion about timing. Mood is "better than before" but still not great. Continuing weekly therapy sessions.</p>
+        <p><strong>Objective:</strong></p>
+        <table class="vitals-table">
+          <tr><th>Vital</th><th>Value</th><th>Status</th></tr>
+          <tr><td>Blood Pressure</td><td>148/92 mmHg</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>Heart Rate</td><td>80 bpm</td><td class="flag-normal">Normal</td></tr>
+          <tr><td>Weight</td><td>78.0 kg</td><td>Stable</td></tr>
+          <tr><td>BMI</td><td>28.8 kg/m²</td><td>Overweight</td></tr>
+          <tr><td>Temperature</td><td>36.9°C</td><td class="flag-normal">Normal</td></tr>
+        </table>
+        <p><strong>PHQ-9 Score:</strong> 12 (moderate) — improved from peak of 18, but still elevated.</p>
+        <p><strong>Assessment:</strong> Multiple chronic conditions with suboptimal control after gap in care. Blood pressure uncontrolled — patient missing amlodipine doses. Need to address medication adherence. Diabetic retinopathy follow-up overdue — no ophthalmology visit documented since initial finding 11 months ago. Neuropathy symptoms worsening. Depression moderate but improving with therapy.</p>
+        <p><strong>Plan:</strong></p>
+        <ul style="margin-left: 20px; margin-bottom: 8px;">
+          <li>Ordered comprehensive labs: HbA1c, CMP, Lipid Panel, Urine Microalbumin, TSH, CBC</li>
+          <li>Referral to podiatry for neuropathy evaluation</li>
+          <li>URGENT re-referral to ophthalmology for diabetic retinopathy follow-up</li>
+          <li>Discussed amlodipine timing — take with morning medications</li>
+          <li>Continue current psychiatric medications, continue therapy</li>
+          <li>Return visit in 6 weeks for lab review and comprehensive reassessment</li>
+        </ul>
+        <p><em>Note: This patient needs closer follow-up given multiple worsening parameters and care gap from past 5 months.</em></p>
+      </div>
+    </div>
+
+    <div class="encounter">
+      <div class="encounter-header">
+        <span class="date">2026-01-15 — Office Visit</span>
+        <span>Provider: Dr. Mark Thompson (covering)</span>
+      </div>
+      <div class="encounter-body">
+        <p><strong>Reason:</strong> Routine follow-up. PCP Dr. Bouchard on medical leave.</p>
+        <p><strong>Notes:</strong> Covering for Dr. Bouchard. Patient presents for routine follow-up. Reviewed chart briefly. Patient reports she is "doing okay." Refilled all current medications. Blood pressure 140/86. Did not perform foot exam. No labs ordered — noted last labs were 3 months ago. Advised patient to schedule follow-up when Dr. Bouchard returns. Visit lasted approximately 8 minutes.</p>
+        <table class="vitals-table">
+          <tr><th>Vital</th><th>Value</th></tr>
+          <tr><td>Blood Pressure</td><td>140/86 mmHg</td></tr>
+          <tr><td>Heart Rate</td><td>74 bpm</td></tr>
+          <tr><td>Weight</td><td>77.6 kg</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="encounter">
+      <div class="encounter-header">
+        <span class="date">2025-10-12 — Office Visit</span>
+        <span>Provider: Dr. Marie-Claire Bouchard</span>
+      </div>
+      <div class="encounter-body">
+        <p><strong>Reason:</strong> Diabetes management, depression follow-up.</p>
+        <p><strong>Notes:</strong> Patient's husband passed away 3 weeks ago. Patient is grieving but attending therapy weekly. Reports poor appetite and sleep disruption. Has lost 1.8 kg but attributes it to not eating regularly rather than intentional weight loss.</p>
+        <p>HbA1c improved slightly to 7.5% — likely due to reduced food intake rather than true metabolic improvement. Fasting glucose 142 mg/dL. Blood pressure 145/90 despite current medications. Discussed adding amlodipine 5mg for better BP control. Also added glipizide 5mg to regimen.</p>
+        <p><strong>Foot exam:</strong> Mild peripheral neuropathy noted in both feet — decreased sensation to monofilament testing. Patient was unaware of sensory changes. Diabetic foot care education provided. Podiatry referral placed.</p>
+        <p><strong>Renal function:</strong> eGFR trending down to 64 mL/min (previously 68). Urine albumin/creatinine ratio elevated at 45 mg/g — consistent with early microalbuminuria. Will monitor closely.</p>
+        <p><strong>PHQ-9:</strong> 18 (moderately severe). Grief process ongoing. Therapy helping but patient still struggling significantly. Will continue current sertraline dose for now.</p>
+        <table class="labs-table">
+          <tr><th>Test</th><th>Result</th><th>Reference</th><th>Flag</th></tr>
+          <tr><td>HbA1c</td><td>7.5%</td><td>&lt;7.0%</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>Fasting Glucose</td><td>142 mg/dL</td><td>70-100</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>Creatinine</td><td>1.2 mg/dL</td><td>0.6-1.2</td><td>Borderline</td></tr>
+          <tr><td>eGFR</td><td>64 mL/min</td><td>&gt;60</td><td>Borderline</td></tr>
+          <tr><td>Urine ACR</td><td>45 mg/g</td><td>&lt;30</td><td class="flag-high">HIGH</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="encounter">
+      <div class="encounter-header">
+        <span class="date">2025-07-18 — Office Visit</span>
+        <span>Provider: Dr. Marie-Claire Bouchard</span>
+      </div>
+      <div class="encounter-body">
+        <p><strong>Reason:</strong> Follow-up on lab results, medication review.</p>
+        <p><strong>Notes:</strong> HbA1c returned at 7.8%, up from 7.1% six months ago. Fasting glucose 156 mg/dL. Patient admits to poor dietary adherence over the past few months due to stress from husband's illness — husband recently diagnosed with lung cancer. Patient visibly emotional during visit. Weight up 2.3 kg. Blood pressure 142/88, higher than target.</p>
+        <p>Increased concern about cardiovascular risk given rising A1c and BP. Discussed adding glipizide to regimen. Patient agreeable.</p>
+        <p><strong>PHQ-9:</strong> 14 (moderate) — worsening from last visit score of 6. Discussed increasing sertraline vs adding therapy referral. Patient prefers therapy. Referral placed to behavioral health.</p>
+        <p><strong>Ophthalmology report received:</strong> Mild nonproliferative diabetic retinopathy noted. Recommended follow-up in 6 months.</p>
+        <table class="labs-table">
+          <tr><th>Test</th><th>Result</th><th>Reference</th><th>Flag</th></tr>
+          <tr><td>HbA1c</td><td>7.8%</td><td>&lt;7.0%</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>Fasting Glucose</td><td>156 mg/dL</td><td>70-100</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>Total Cholesterol</td><td>218 mg/dL</td><td>&lt;200</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>LDL</td><td>132 mg/dL</td><td>&lt;100</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>HDL</td><td>48 mg/dL</td><td>&gt;40</td><td class="flag-normal">Normal</td></tr>
+          <tr><td>eGFR</td><td>68 mL/min</td><td>&gt;60</td><td>Borderline</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="encounter">
+      <div class="encounter-header">
+        <span class="date">2025-04-10 — Office Visit</span>
+        <span>Provider: Dr. Marie-Claire Bouchard</span>
+      </div>
+      <div class="encounter-body">
+        <p><strong>Reason:</strong> Routine diabetes and hypertension follow-up.</p>
+        <p><strong>Notes:</strong> Patient reports feeling well overall. Compliant with medications. Blood pressure 136/82. HbA1c drawn today. Discussed importance of diet and exercise. Patient mentions occasional dizziness when standing up quickly — advised to rise slowly and stay hydrated. Depression symptoms stable. PHQ-9: 6 (mild). Referred to ophthalmology for annual diabetic eye exam.</p>
+        <table class="vitals-table">
+          <tr><th>Vital</th><th>Value</th></tr>
+          <tr><td>Blood Pressure</td><td>136/82 mmHg</td></tr>
+          <tr><td>Heart Rate</td><td>76 bpm</td></tr>
+          <tr><td>Weight</td><td>76.2 kg</td></tr>
+          <tr><td>BMI</td><td>28.1 kg/m²</td></tr>
+        </table>
+        <table class="labs-table">
+          <tr><th>Test</th><th>Result</th><th>Reference</th><th>Flag</th></tr>
+          <tr><td>HbA1c</td><td>7.1%</td><td>&lt;7.0%</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>Fasting Glucose</td><td>128 mg/dL</td><td>70-100</td><td class="flag-high">HIGH</td></tr>
+          <tr><td>Total Cholesterol</td><td>198 mg/dL</td><td>&lt;200</td><td class="flag-normal">Normal</td></tr>
+          <tr><td>LDL</td><td>112 mg/dL</td><td>&lt;100</td><td class="flag-high">HIGH</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

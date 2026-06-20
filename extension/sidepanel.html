@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Continuity Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div>
+      <h1 class="header-title">Continuity Copilot</h1>
+      <p class="header-subtitle">Patient intelligence for primary care</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot"></span> FHIR Connected
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Analyze Page -->
+    <div class="card analyze-card">
+      <button id="analyzePageBtn" class="btn-analyze">
+        <span class="analyze-icon">&#9672;</span>
+        Analyze This Page
+      </button>
+      <p class="analyze-hint">Reads the patient document open in your current tab</p>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"><span>or search FHIR</span></div>
+
+    <!-- Search -->
+    <div class="card search-card">
+      <form id="searchForm" class="search-form">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by name or patient ID..."
+          class="search-input"
+        />
+        <button type="submit" id="searchBtn" class="btn-primary">Search</button>
+      </form>
+      <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading-card" style="display:none">
+      <div class="spinner"></div>
+      <div class="loading-title">Analyzing patient record...</div>
+      <p class="loading-text">Fetching FHIR data and running clinical analysis</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error" class="error-card" style="display:none"></div>
+
+    <!-- Results -->
+    <div id="results" style="display:none">
+      <!-- Patient header -->
+      <div class="patient-header">
+        <div>
+          <h2 id="patientName" class="patient-name"></h2>
+          <span id="patientMeta" class="patient-meta"></span>
+        </div>
+        <span id="analysisTime" class="analysis-time"></span>
+      </div>
+
+      <!-- Sections (stacked vertically for sidebar) -->
+      <div class="sections">
+        <div class="section" id="storySection">
+          <div class="section-header" data-color="blue">
+            <div class="section-dot blue"></div>
+            <div class="section-title-wrap">
+              <h3 class="section-title">Patient Story</h3>
+              <p class="section-subtitle">Who is this patient?</p>
+            </div>
+          </div>
+          <div id="storyPreview" class="section-content"></div>
+          <div id="storyFull" class="section-content" style="display:none"></div>
+          <button id="storyToggle" class="expand-btn blue-text" style="display:none">Read more</button>
+        </div>
+
+        <div class="section" id="changesSection">
+          <div class="section-header" data-color="amber">
+            <div class="section-dot amber"></div>
+            <div class="section-title-wrap">
+              <h3 class="section-title">What Changed</h3>
+              <p class="section-subtitle">Since last visit</p>
+            </div>
+            <span id="changesCount" class="badge amber-bg"></span>
+          </div>
+          <ul id="changesList" class="item-list"></ul>
+          <button id="changesToggle" class="expand-btn amber-text" style="display:none"></button>
+        </div>
+
+        <div class="section" id="risksSection">
+          <div class="section-header" data-color="red">
+            <div class="section-dot red"></div>
+            <div class="section-title-wrap">
+              <h3 class="section-title">What Needs Attention</h3>
+              <p class="section-subtitle">Likely to fall through the cracks</p>
+            </div>
+            <span id="risksCount" class="badge red-bg"></span>
+          </div>
+          <ul id="risksList" class="item-list"></ul>
+          <button id="risksToggle" class="expand-btn red-text" style="display:none"></button>
+        </div>
+
+        <div class="section" id="actionsSection">
+          <div class="section-header" data-color="green">
+            <div class="section-dot green"></div>
+            <div class="section-title-wrap">
+              <h3 class="section-title">Recommended Actions</h3>
+              <p class="section-subtitle">Actionable steps for this visit</p>
+            </div>
+            <span id="actionsCount" class="badge green-bg"></span>
+          </div>
+          <ul id="actionsList" class="item-list"></ul>
+          <button id="actionsToggle" class="expand-btn green-text" style="display:none"></button>
+        </div>
+      </div>
+
+      <div class="footer">
+        AI-generated for clinical decision support. Verify against the patient record.
+      </div>
+    </div>
+  </main>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

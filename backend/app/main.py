@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from app.models import CopilotRequest, CopilotResponse, PatientSummary
+from app.models import CopilotRequest, CopilotResponse, PatientSummary, PageAnalysisRequest
 from app.fhir_client import get_full_patient_record, format_patient_timeline, search_patients, get_patient
 from app.graph import copilot_graph
 
@@ -95,6 +95,45 @@ async def run_copilot(request: CopilotRequest):
             actions=result["actions"],
         ),
         sources=[f"FHIR Server: Patient/{request.patient_id}"],
+        processing_time_seconds=round(elapsed, 2),
+    )
+
+
+@app.post("/api/analyze-page", response_model=CopilotResponse)
+async def analyze_page(request: PageAnalysisRequest):
+    start = time.time()
+
+    if not request.page_text.strip():
+        raise HTTPException(status_code=400, detail="No text content found on page")
+
+    timeline = f"DOCUMENT SOURCE: {request.page_title or 'Unknown'}\n"
+    timeline += f"URL: {request.page_url or 'Unknown'}\n\n"
+    timeline += request.page_text[:15000]
+
+    initial_state = {
+        "patient_id": "page-analysis",
+        "patient_name": request.page_title or "Patient from EMR",
+        "timeline": timeline,
+        "story": "",
+        "changes": [],
+        "risks": [],
+        "actions": [],
+    }
+
+    result = await copilot_graph.ainvoke(initial_state)
+
+    elapsed = time.time() - start
+
+    return CopilotResponse(
+        summary=PatientSummary(
+            patient_id="page-analysis",
+            patient_name=result.get("patient_name", "Patient from EMR"),
+            story=result["story"],
+            changes=result["changes"],
+            risks=result["risks"],
+            actions=result["actions"],
+        ),
+        sources=[request.page_url or "Current browser tab"],
         processing_time_seconds=round(elapsed, 2),
     )
 

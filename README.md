@@ -1,4 +1,4 @@
-# Charted: An AI EMR Helper
+# Uncharted: An AI EMR Helper
 
 A Chrome extension that reads any web-based EMR and gives clinicians a complete patient picture in 30 seconds. No new login, no copy-pasting, no switching tabs.
 

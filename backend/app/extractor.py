@@ -211,7 +211,7 @@ _DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})\s*[—\-–]")
 _LAB_RE = re.compile(
     r"(HbA1c|Fasting\s+Glucose|Glucose|Total\s+Cholesterol|LDL|HDL|eGFR|Creatinine|"
     r"Urine\s+ACR|Blood\s+Pressure|Weight|BMI|Triglycerides|TSH|Potassium)"
-    r"[\s:\t]+(\d+\.?\d*)\s*(%|mg/dL|mg/g|mL/min|mmol/L|kg|kg/m²|mIU/L|bpm|mmHg)?",
+    r"[\s:\t]+(\d+\.?\d*)(?:/(\d+\.?\d*))?\s*(%|mg/dL|mg/g|mL/min|mmol/L|kg|kg/m²|mIU/L|bpm|mmHg)?",
     re.IGNORECASE,
 )
 _PAGE_LAB_MAP: dict[str, str] = {
@@ -266,13 +266,26 @@ def extract_from_page_text(text: str, page_title: str = "") -> PatientRecord:
                 value = round(float(m.group(2)), 2)
             except ValueError:
                 continue
-            unit = m.group(3) or LAB_UNITS.get(label, "")
+            unit = m.group(4) or LAB_UNITS.get(label, "")
             ref = LAB_REFS.get(label)
             raw_labs.setdefault(label, []).append(LabReading(
                 name=label, value=value, unit=unit, date=date_str,
                 ref_low=ref[0] if ref else None,
                 ref_high=ref[1] if ref else None,
             ))
+            # "Blood Pressure 120/80" — extract diastolic from the slash value
+            if m.group(3) is not None and label == "Systolic BP":
+                try:
+                    dia_value = round(float(m.group(3)), 2)
+                except ValueError:
+                    pass
+                else:
+                    dia_ref = LAB_REFS.get("Diastolic BP")
+                    raw_labs.setdefault("Diastolic BP", []).append(LabReading(
+                        name="Diastolic BP", value=dia_value, unit=unit, date=date_str,
+                        ref_low=dia_ref[0] if dia_ref else None,
+                        ref_high=dia_ref[1] if dia_ref else None,
+                    ))
 
     pr.labs = _dedup_and_sort(raw_labs)
     return pr

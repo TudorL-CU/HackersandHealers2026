@@ -53,6 +53,20 @@ body {
 .btn-analyze:disabled { opacity: 0.6; cursor: not-allowed; }
 .analyze-icon { font-size: 16px; }
 .analyze-hint { font-size: 11px; color: #6b7280; margin-top: 8px; }
+.btn-analyze-sm {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.btn-analyze-sm:hover { background: rgba(255,255,255,0.3); }
+.btn-analyze-sm:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .divider {
   display: flex;

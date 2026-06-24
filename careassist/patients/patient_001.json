@@ -1,0 +1,218 @@
+{
+  "resourceType": "Bundle",
+  "id": "patient-001-bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "patient-001",
+        "name": [{ "family": "Tremblay", "given": ["Margaret", "Louise"] }],
+        "birthDate": "1948-03-14",
+        "gender": "female",
+        "address": [{ "city": "Ottawa", "state": "ON", "country": "CA" }]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-001-1",
+        "subject": { "reference": "Patient/patient-001" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "44054006", "display": "Type 2 diabetes mellitus" }],
+          "text": "Type 2 Diabetes Mellitus"
+        },
+        "onsetDateTime": "2010-06-12"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-001-2",
+        "subject": { "reference": "Patient/patient-001" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "38341003", "display": "Hypertension" }],
+          "text": "Essential Hypertension"
+        },
+        "onsetDateTime": "2008-01-20"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-001-3",
+        "subject": { "reference": "Patient/patient-001" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "64859006", "display": "Osteoporosis" }],
+          "text": "Osteoporosis"
+        },
+        "onsetDateTime": "2015-09-05"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-001-4",
+        "subject": { "reference": "Patient/patient-001" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "40425004", "display": "Hypothyroidism" }],
+          "text": "Hypothyroidism"
+        },
+        "onsetDateTime": "2012-11-18"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-001-1",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "860975", "display": "Metformin 500mg" }],
+          "text": "Metformin 500mg twice daily"
+        },
+        "authoredOn": "2010-06-20"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-001-2",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "197361", "display": "Ramipril 5mg" }],
+          "text": "Ramipril 5mg daily"
+        },
+        "authoredOn": "2008-02-10"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-001-3",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "315671", "display": "Alendronate 70mg" }],
+          "text": "Alendronate 70mg weekly"
+        },
+        "authoredOn": "2015-09-20"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-001-4",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "966572", "display": "Levothyroxine 100mcg" }],
+          "text": "Levothyroxine 100mcg daily"
+        },
+        "authoredOn": "2012-12-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-001-5",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "153165", "display": "Atorvastatin 20mg" }],
+          "text": "Atorvastatin 20mg daily"
+        },
+        "authoredOn": "2014-03-15"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-001-1",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "4548-4", "display": "HbA1c" }],
+          "text": "Hemoglobin A1c"
+        },
+        "valueQuantity": { "value": 8.9, "unit": "%" },
+        "effectiveDateTime": "2024-11-15"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-001-2",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "2160-0", "display": "Creatinine" }],
+          "text": "Serum Creatinine"
+        },
+        "valueQuantity": { "value": 98, "unit": "umol/L" },
+        "effectiveDateTime": "2024-11-15"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-001-3",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "3016-3", "display": "TSH" }],
+          "text": "Thyroid Stimulating Hormone"
+        },
+        "valueQuantity": { "value": 4.8, "unit": "mIU/L" },
+        "effectiveDateTime": "2024-04-02"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-001-4",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "2093-3", "display": "Total Cholesterol" }],
+          "text": "Total Cholesterol"
+        },
+        "valueQuantity": { "value": 5.8, "unit": "mmol/L" },
+        "effectiveDateTime": "2024-04-02"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-001-5",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "1751-7", "display": "Albumin" }],
+          "text": "Urine Albumin-to-Creatinine Ratio"
+        },
+        "valueQuantity": { "value": 42, "unit": "mg/mmol" },
+        "effectiveDateTime": "2023-12-10"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-001-6",
+        "subject": { "reference": "Patient/patient-001" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "72166-2", "display": "Vitamin D" }],
+          "text": "25-OH Vitamin D"
+        },
+        "valueQuantity": { "value": 38, "unit": "nmol/L" },
+        "effectiveDateTime": "2023-09-05"
+      }
+    }
+  ]
+}

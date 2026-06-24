@@ -1,0 +1,192 @@
+{
+  "resourceType": "Bundle",
+  "id": "patient-003-bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "patient-003",
+        "name": [{ "family": "Nguyen", "given": ["Linh", "Phuong"] }],
+        "birthDate": "1995-05-30",
+        "gender": "female",
+        "address": [{ "city": "Vancouver", "state": "BC", "country": "CA" }]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-003-1",
+        "subject": { "reference": "Patient/patient-003" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "13746004", "display": "Bipolar disorder" }],
+          "text": "Bipolar Disorder Type I"
+        },
+        "onsetDateTime": "2017-09-14"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-003-2",
+        "subject": { "reference": "Patient/patient-003" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "36010009", "display": "Generalized anxiety disorder" }],
+          "text": "Generalized Anxiety Disorder"
+        },
+        "onsetDateTime": "2016-03-22"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-003-3",
+        "subject": { "reference": "Patient/patient-003" },
+        "clinicalStatus": { "coding": [{ "code": "active" }] },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "40930008", "display": "Hypothyroidism" }],
+          "text": "Subclinical Hypothyroidism"
+        },
+        "onsetDateTime": "2021-11-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-003-1",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "387207008", "display": "Lithium carbonate 300mg" }],
+          "text": "Lithium carbonate 300mg three times daily"
+        },
+        "authoredOn": "2017-10-05"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-003-2",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "372687006", "display": "Quetiapine 100mg" }],
+          "text": "Quetiapine 100mg at bedtime"
+        },
+        "authoredOn": "2019-02-18"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-003-3",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "372596008", "display": "Sertraline 50mg" }],
+          "text": "Sertraline 50mg daily"
+        },
+        "authoredOn": "2020-08-11"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-003-4",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "active",
+        "medicationCodeableConcept": {
+          "coding": [{ "code": "387384004", "display": "Clonazepam 0.5mg" }],
+          "text": "Clonazepam 0.5mg as needed (max 1mg/day)"
+        },
+        "authoredOn": "2022-04-07"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-003-1",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "14334-7", "display": "Lithium serum level" }],
+          "text": "Lithium Level (serum)"
+        },
+        "valueQuantity": { "value": 0.4, "unit": "mmol/L" },
+        "effectiveDateTime": "2024-08-22"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-003-2",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "2160-0", "display": "Creatinine" }],
+          "text": "Serum Creatinine (Lithium nephrotoxicity monitoring)"
+        },
+        "valueQuantity": { "value": 72, "unit": "umol/L" },
+        "effectiveDateTime": "2024-08-22"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-003-3",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "3016-3", "display": "TSH" }],
+          "text": "Thyroid Stimulating Hormone"
+        },
+        "valueQuantity": { "value": 5.9, "unit": "mIU/L" },
+        "effectiveDateTime": "2024-08-22"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-003-4",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "2345-7", "display": "Glucose" }],
+          "text": "Fasting Blood Glucose (Quetiapine metabolic monitoring)"
+        },
+        "valueQuantity": { "value": 5.4, "unit": "mmol/L" },
+        "effectiveDateTime": "2024-08-22"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-003-5",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "2093-3", "display": "Total Cholesterol" }],
+          "text": "Fasting Lipid Panel"
+        },
+        "valueQuantity": { "value": 5.1, "unit": "mmol/L" },
+        "effectiveDateTime": "2023-05-10"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-003-6",
+        "subject": { "reference": "Patient/patient-003" },
+        "status": "final",
+        "code": {
+          "coding": [{ "system": "http://loinc.org", "code": "29463-7", "display": "Body weight" }],
+          "text": "Body Weight"
+        },
+        "valueQuantity": { "value": 78, "unit": "kg" },
+        "effectiveDateTime": "2024-08-22"
+      }
+    }
+  ]
+}
